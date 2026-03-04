@@ -1,11 +1,131 @@
+import { useEffect, useState } from "react";
+
+const API_BASE = "https://localhost:7027/api";
+const BACKEND_URL = "https://localhost:7114";
+
+// ===== TYPE =====
+interface CartItem {
+  billDetailID: number;
+  coffeeName: string;
+  imageURL: string | null;
+  unitPrice: number;
+  quantity: number;
+  subTotal: number;
+}
+
 export default function Cart() {
+  const [cartData, setCartData] = useState<CartItem[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [showForm, setShowForm] = useState<boolean>(false);
+
+  const token = localStorage.getItem("accessToken");
+
+  // ================= LOAD CART =================
+  const loadCart = async () => {
+    if (!token) {
+      alert("Bạn chưa đăng nhập!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/Cart`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 401) {
+        alert("Phiên đăng nhập hết hạn!");
+        localStorage.removeItem("accessToken");
+        return;
+      }
+
+      const data: CartItem[] = await response.json();
+      setCartData(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadCart();
+  }, []);
+
+  // ================= UPDATE TOTAL =================
+  useEffect(() => {
+    const newTotal = cartData.reduce((sum, item) => sum + item.subTotal, 0);
+    setTotal(newTotal);
+  }, [cartData]);
+
+  // ================= UPDATE QUANTITY =================
+  const changeQuantity = async (billDetailID: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/Cart/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          billDetailID,
+          quantity: newQuantity,
+        }),
+      });
+
+      const message = await res.text();
+
+      if (!res.ok) {
+        alert(message);
+        return;
+      }
+
+      loadCart();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ================= CHECKOUT =================
+  const processCheckout = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/Cart/checkout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const message = await res.text();
+
+      if (!res.ok) {
+        alert(message);
+        return;
+      }
+
+      alert(message);
+      loadCart();
+      setShowForm(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formatMoney = (number: number): string => {
+    return number.toLocaleString("vi-VN") + " VND";
+  };
+
+  // ================= UI =================
   return (
-    <>
-      <div id="container">
-        <h1 style={{ margin: 0 }}>GIỎ HÀNG</h1>
-        <div className="infor-cart">
-          <div className="left-infor-cart">
-            <table className="table-infor-cart">
+    <div id="container">
+      <h1 style={{ margin: 0 }}>GIỎ HÀNG</h1>
+
+      <div className="infor-cart">
+        <div className="left-infor-cart">
+          <table className="table-infor-cart">
+            <thead>
               <tr>
                 <th>Hình ảnh</th>
                 <th>Tên sản phẩm</th>
@@ -13,20 +133,73 @@ export default function Cart() {
                 <th>Số lượng</th>
                 <th>Thành tiền</th>
               </tr>
-              <tbody id="cart-items"></tbody>
-            </table>
+            </thead>
+            <tbody>
+              {cartData.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center" }}>
+                    Giỏ hàng trống
+                  </td>
+                </tr>
+              ) : (
+                cartData.map((item) => (
+                  <tr key={item.billDetailID}>
+                    <td>
+                      <img
+                        src={
+                          item.imageURL
+                            ? BACKEND_URL + item.imageURL
+                            : "/img/default.png"
+                        }
+                        width="60"
+                        alt=""
+                      />
+                    </td>
+                    <td>{item.coffeeName}</td>
+                    <td>{formatMoney(item.unitPrice)}</td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          changeQuantity(item.billDetailID, item.quantity - 1)
+                        }
+                      >
+                        -
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          changeQuantity(item.billDetailID, item.quantity + 1)
+                        }
+                      >
+                        +
+                      </button>
+                    </td>
+                    <td>{formatMoney(item.subTotal)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="right-infor-cart">
+          <p>Tạm tính</p>
+          <hr />
+          <div className="total">
+            <p>Tổng</p>
+            <p>{formatMoney(total)}</p>
           </div>
-          <div className="right-infor-cart">
-            <p>Tạm tính</p>
-            <hr />
-            <div className="total">
-              <p>Tổng</p>
-              <p id="total-price">0VND</p>
-            </div>
-            <button>Đặt hàng</button>
-          </div>
+          <button onClick={() => setShowForm(true)}>Đặt hàng</button>
         </div>
       </div>
-    </>
+
+      {showForm && (
+        <div id="checkoutForm">
+          <h3>Thông tin thanh toán</h3>
+          <button onClick={processCheckout}>Xác nhận</button>
+          <button onClick={() => setShowForm(false)}>Hủy</button>
+        </div>
+      )}
+    </div>
   );
 }

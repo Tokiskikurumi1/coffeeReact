@@ -6,7 +6,7 @@ import Product from "../pages/Product";
 import Contact from "../pages/Contact";
 import Cart from "../pages/Cart";
 import ProductDetail from "../pages/ProductDetail";
-// import Login from "../pages/Login";
+import Login from "../pages/Login";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -14,10 +14,10 @@ export default function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="intro" element={<Introduct />} />
         <Route path="products" element={<Product />} />
-        <Route path="productDetail" element={<ProductDetail />} />
+        <Route path="products/:id" element={<ProductDetail />} />
         <Route path="contact" element={<Contact />} />
         <Route path="cart" element={<Cart />} />
-        {/* <Route path="login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
       </Route>
     </Routes>
   );
