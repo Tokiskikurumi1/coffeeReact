@@ -1,12 +1,42 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Header() {
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setCurrentUser(user);
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+
+    setCurrentUser(null);
+    navigate("/"); // về trang chủ
+    window.location.reload(); // giống JS cũ
+  };
+
   return (
     <div id="header">
       <div className="login-table">
-        <span>
-          <Link to="/login">Đăng nhập</Link>
-        </span>
+        {currentUser ? (
+          <span>
+            Chào mừng: {currentUser} |{" "}
+            <a href="#" onClick={handleLogout}>
+              Đăng xuất
+            </a>
+          </span>
+        ) : (
+          <span>
+            <Link to="/login">Đăng nhập</Link>
+          </span>
+        )}
       </div>
 
       <div className="tabbar-control">

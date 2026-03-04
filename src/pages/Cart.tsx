@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 const API_BASE = "https://localhost:7027/api";
 const BACKEND_URL = "https://localhost:7114";
 
-// ===== TYPE =====
 interface CartItem {
   billDetailID: number;
   coffeeName: string;
@@ -16,12 +15,11 @@ interface CartItem {
 export default function Cart() {
   const [cartData, setCartData] = useState<CartItem[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [showForm, setShowForm] = useState<boolean>(false);
-
-  const token = localStorage.getItem("accessToken");
 
   // ================= LOAD CART =================
   const loadCart = async () => {
+    const token = localStorage.getItem("accessToken");
+
     if (!token) {
       alert("Bạn chưa đăng nhập!");
       return;
@@ -60,6 +58,10 @@ export default function Cart() {
 
   // ================= UPDATE QUANTITY =================
   const changeQuantity = async (billDetailID: number, newQuantity: number) => {
+    if (newQuantity <= 0) return;
+
+    const token = localStorage.getItem("accessToken");
+
     try {
       const res = await fetch(`${API_BASE}/Cart/update`, {
         method: "PUT",
@@ -80,7 +82,7 @@ export default function Cart() {
         return;
       }
 
-      loadCart(); // giống JS cũ
+      loadCart();
     } catch (err) {
       console.error(err);
     }
@@ -88,6 +90,13 @@ export default function Cart() {
 
   // ================= CHECKOUT =================
   const processCheckout = async () => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      alert("Bạn chưa đăng nhập!");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE}/Cart/checkout`, {
         method: "POST",
@@ -105,7 +114,6 @@ export default function Cart() {
 
       alert(message);
       loadCart();
-      setShowForm(false);
     } catch (err) {
       console.error(err);
     }
@@ -157,14 +165,18 @@ export default function Cart() {
                     <td>{formatMoney(item.unitPrice)}</td>
                     <td>
                       <button
+                        className="btnUpdateQuantity"
                         onClick={() =>
                           changeQuantity(item.billDetailID, item.quantity - 1)
                         }
                       >
                         -
                       </button>
-                      <span className="quantity">{item.quantity}</span>
+
+                      <span style={{ margin: "0 10px" }}>{item.quantity}</span>
+
                       <button
+                        className="btnUpdateQuantity"
                         onClick={() =>
                           changeQuantity(item.billDetailID, item.quantity + 1)
                         }
@@ -187,17 +199,10 @@ export default function Cart() {
             <p>Tổng</p>
             <p>{formatMoney(total)}</p>
           </div>
-          <button onClick={() => setShowForm(true)}>Đặt hàng</button>
+
+          <button onClick={processCheckout}>Đặt hàng</button>
         </div>
       </div>
-
-      {showForm && (
-        <div id="checkoutForm">
-          <h3>Thông tin thanh toán</h3>
-          <button onClick={processCheckout}>Xác nhận</button>
-          <button onClick={() => setShowForm(false)}>Hủy</button>
-        </div>
-      )}
     </div>
   );
 }

@@ -596,6 +596,12 @@ textarea:focus {
 
 .quantity {
   color: #4b2e2e;
+  margin: 0px 6px;
+}
+
+.btnUpdateQuantity {
+  width: 20px;
+  height: 20px;
 }
 
 /* ================= RIGHT SUMMARY ================= */
