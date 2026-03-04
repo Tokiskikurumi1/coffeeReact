@@ -60,8 +60,6 @@ export default function Cart() {
 
   // ================= UPDATE QUANTITY =================
   const changeQuantity = async (billDetailID: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-
     try {
       const res = await fetch(`${API_BASE}/Cart/update`, {
         method: "PUT",
@@ -82,7 +80,7 @@ export default function Cart() {
         return;
       }
 
-      loadCart();
+      loadCart(); // giống JS cũ
     } catch (err) {
       console.error(err);
     }

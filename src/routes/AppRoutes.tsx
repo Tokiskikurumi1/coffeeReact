@@ -10,6 +10,7 @@ import Login from "../pages/Login";
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="intro" element={<Introduct />} />
@@ -17,7 +18,6 @@ export default function AppRoutes() {
         <Route path="products/:id" element={<ProductDetail />} />
         <Route path="contact" element={<Contact />} />
         <Route path="cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
       </Route>
     </Routes>
   );
