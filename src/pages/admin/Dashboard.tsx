@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import "./base.css";
+
 const API_BASE = "https://localhost:7114/api/ManageProduct";
 
 export default function Dashboard() {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [preview, setPreview] = useState<string>("");
+
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const pageSize = 10;
 
   const [form, setForm] = useState({
     name: "",
@@ -121,6 +127,39 @@ export default function Dashboard() {
     loadProducts();
   };
 
+  // ================= LOCK / UNLOCK =================
+  const lockProduct = async (id: number) => {
+    try {
+      const res = await fetch(`${API_BASE}/update-status/${id}`, {
+        method: "PUT",
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      loadProducts(); // reload lại list
+    } catch (error) {
+      console.error(error);
+      alert("Lỗi khi cập nhật trạng thái!");
+    }
+  };
+  // ================= SEARCH =================
+
+  const filteredProducts = products.filter((p) =>
+    p.coffeeName.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  // ================= PAGINATION =================
+
+  const totalPages = Math.ceil(filteredProducts.length / pageSize);
+
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  const currentProducts = filteredProducts.slice(start, end);
+
   // ================= UI =================
 
   return (
@@ -173,13 +212,7 @@ export default function Dashboard() {
               </button>
 
               {preview && (
-                <img
-                  src={preview}
-                  style={{
-                    width: 120,
-                    marginTop: 10,
-                  }}
-                />
+                <img src={preview} style={{ width: 120, marginTop: 10 }} />
               )}
             </div>
 
@@ -207,12 +240,27 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* TABLE */}
+        {/* PRODUCT LIST */}
 
         <section className="product-list-card">
           <h2>
             <i className="fas fa-list-ul"></i> Danh sách menu
           </h2>
+
+          {/* SEARCH */}
+          <input
+            placeholder="Tìm sản phẩm..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            style={{
+              marginBottom: 20,
+              padding: 8,
+              width: 300,
+            }}
+          />
 
           <div className="table-container">
             <table className="product-table">
@@ -229,14 +277,14 @@ export default function Dashboard() {
               </thead>
 
               <tbody>
-                {products.map((p, index) => {
+                {currentProducts.map((p, index) => {
                   const category = categories.find(
                     (c) => c.categoryID === p.categoryID,
                   );
 
                   return (
                     <tr key={p.coffeeID}>
-                      <td>{index + 1}</td>
+                      <td>{start + index + 1}</td>
 
                       <td>
                         <img
@@ -252,7 +300,14 @@ export default function Dashboard() {
                       <td>{category?.categoryName}</td>
 
                       <td>
-                        {p.status === 1 ? "Đang phục vụ" : "Ngưng phục vụ"}
+                        <span
+                          style={{
+                            color: p.status === 1 ? "green" : "red",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {p.status === 1 ? "Đang phục vụ" : "Ngưng phục vụ"}
+                        </span>
                       </td>
 
                       <td>
@@ -263,12 +318,45 @@ export default function Dashboard() {
                         <button onClick={() => deleteProduct(p.coffeeID)}>
                           <i className="fas fa-trash"></i>
                         </button>
+
+                        <button onClick={() => lockProduct(p.coffeeID)}>
+                          {p.status === 1 ? (
+                            <i
+                              className="fas fa-lock-open"
+                              style={{ color: "green" }}
+                            ></i>
+                          ) : (
+                            <i
+                              className="fas fa-lock"
+                              style={{ color: "red" }}
+                            ></i>
+                          )}
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* PAGINATION */}
+
+          <div style={{ marginTop: 20 }}>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i + 1)}
+                style={{
+                  marginRight: 5,
+                  background: page === i + 1 ? "#333" : "#ddd",
+                  color: page === i + 1 ? "#fff" : "#000",
+                  padding: "5px 10px",
+                }}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
         </section>
       </main>
