@@ -7,6 +7,8 @@ import Contact from "../pages/Contact";
 import Cart from "../pages/Cart";
 import ProductDetail from "../pages/ProductDetail";
 import Login from "../pages/Login";
+import Dashboard from "../pages/admin/Dashboard";
+import AdminLayout from "../components/layout/AdminLayout";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -18,6 +20,9 @@ export default function AppRoutes() {
         <Route path="products/:id" element={<ProductDetail />} />
         <Route path="contact" element={<Contact />} />
         <Route path="cart" element={<Cart />} />
+      </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="Dashboard" element={<Dashboard />} />
       </Route>
     </Routes>
   );

@@ -41,13 +41,13 @@ export default function Login() {
           PasswordHash: loginData.password,
         }),
       });
-
+      const data = await res.json();
       if (!res.ok) {
-        alert("Sai tài khoản hoặc mật khẩu");
+        alert(data.message || "Sai tài khoản hoặc mật khẩu");
         return;
       }
 
-      const data = await res.json();
+      // const data = await res.json();
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user", data.user);

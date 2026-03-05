@@ -58,7 +58,7 @@ export default function Cart() {
 
   // ================= UPDATE QUANTITY =================
   const changeQuantity = async (billDetailID: number, newQuantity: number) => {
-    if (newQuantity <= 0) return;
+    if (newQuantity < 0) return;
 
     const token = localStorage.getItem("accessToken");
 
