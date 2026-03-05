@@ -99,7 +99,7 @@ select:focus {
   object-fit: cover;
   border-radius: 8px;
   border: 2px dashed #bcaaa4;
-  display: none;
+  display: block;
 }
 
 /* Button chính */
