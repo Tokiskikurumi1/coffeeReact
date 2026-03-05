@@ -156,7 +156,21 @@ export default function Dashboard() {
             <div className="form-group">
               <label>Ảnh</label>
 
-              <input type="file" onChange={handleImage} />
+              <input
+                type="file"
+                id="productImage"
+                accept="image/*"
+                hidden
+                onChange={handleImage}
+              />
+
+              <button
+                type="button"
+                className="btn-upload"
+                onClick={() => document.getElementById("productImage")?.click()}
+              >
+                <i className="fas fa-image"></i> Chọn ảnh
+              </button>
 
               {preview && (
                 <img
