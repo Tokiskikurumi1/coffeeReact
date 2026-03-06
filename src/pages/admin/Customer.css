@@ -1,0 +1,269 @@
+body,
+h1,
+h2,
+h3,
+table,
+th,
+td,
+input,
+button {
+  font-family: "Poppins", sans-serif !important;
+}
+
+h2 {
+  color: #6b4e31;
+  font-weight: 600;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.8rem; /* giống Dashboard */
+}
+
+/* Đồng bộ với các trang trước */
+.admin-main {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.customers-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+h2 {
+  color: #6b4e31;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 10px 14px;
+  border: 1px solid #d7ccc8;
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 220px;
+  transition: 0.2s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: #8d6e63;
+  box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.15);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.customers-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+}
+
+.customers-table th,
+.customers-table td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.customers-table thead {
+  background: #8d6e63;
+  color: white;
+}
+
+.customers-table th {
+  font-weight: 600;
+}
+
+.customers-table tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: 0.15s;
+}
+
+.customers-table tbody tr:hover {
+  background: #fff8f5;
+}
+
+.customers-table .btn-action {
+  background: none;
+  border: none;
+  color: #6b4e31;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin: 0 6px;
+  transition: 0.2s;
+}
+
+.customers-table .btn-action:hover {
+  color: #8d6e63;
+  transform: scale(1.15);
+}
+
+/* Modal (đồng bộ với bills & dashboard) */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+  color: #777;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #5d4037;
+}
+
+input {
+  padding: 12px 16px;
+  border: 1px solid #d7ccc8;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #8d6e63;
+  box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.15);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  background: #6b4e31;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #8d6e63;
+}
+
+.btn-secondary {
+  background: #6b4e31;
+  color: #bdbdbd;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.action-icons i {
+  margin: 0 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.view-icon {
+  color: #007bff;
+}
+
+.view-icon:hover {
+  color: #0056b3;
+}
+
+.status-active {
+  color: green;
+}
+
+.status-active:hover {
+  color: darkgreen;
+}
+
+.status-locked {
+  color: red;
+}
+
+.status-locked:hover {
+  color: darkred;
+}
+
+.no-action {
+  color: #aaa;
+}
+/* Responsive cho bảng trên mobile */
+@media (max-width: 768px) {
+  .customers-table thead {
+    display: none;
+  }
+  .customers-table tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+  }
+  .customers-table td {
+    display: block;
+    text-align: right;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  .customers-table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    color: #6b4e31;
+  }
+  .customers-table td:last-child {
+    text-align: center;
+  }
+}

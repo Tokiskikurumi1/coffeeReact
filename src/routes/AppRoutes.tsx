@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Router } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import Home from "../pages/Home";
 import Introduct from "../pages/Introduct";
@@ -9,6 +9,8 @@ import ProductDetail from "../pages/ProductDetail";
 import Login from "../pages/Login";
 import Dashboard from "../pages/admin/Dashboard";
 import AdminLayout from "../components/layout/AdminLayout";
+import Bills from "../pages/admin/Bill";
+import Customer from "../pages/admin/Customer";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -23,6 +25,8 @@ export default function AppRoutes() {
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="Dashboard" element={<Dashboard />} />
+        <Route path="Bills" element={<Bills />} />
+        <Route path="Customers" element={<Customer />} />
       </Route>
     </Routes>
   );

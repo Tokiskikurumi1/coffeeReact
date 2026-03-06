@@ -1,0 +1,295 @@
+body,
+h1,
+h2,
+h3,
+table,
+th,
+td,
+input,
+button {
+  font-family: "Poppins", sans-serif !important;
+}
+
+h2 {
+  color: #6b4e31;
+  font-weight: 600;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.8rem; /* giống Dashboard */
+}
+
+/* Đồng bộ với giao diện trước */
+.admin-main {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.bills-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+h2 {
+  color: #6b4e31;
+  margin-bottom: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.bills-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 15px;
+}
+
+.bills-table th,
+.bills-table td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.bills-table thead {
+  background: #8d6e63;
+  color: white;
+}
+
+.bills-table th {
+  font-weight: 600;
+}
+
+.bills-table tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: 0.15s;
+}
+
+.bills-table tbody tr:hover {
+  background: #fff8f5;
+}
+
+.bills-table .btn-action {
+  background: none;
+  border: none;
+  color: #6b4e31;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin: 0 6px;
+  transition: 0.2s;
+}
+
+.bills-table .btn-action:hover {
+  color: #8d6e63;
+  transform: scale(1.15);
+}
+
+.status-paid {
+  color: #388e3c;
+  font-weight: 600;
+}
+.status-pending {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+/* Modal chung (đã có ở main css, nhưng bổ sung) */
+.modal-content h2 {
+  margin-bottom: 20px;
+}
+
+.bill-info {
+  background: #fff8f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.detail-table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.detail-table th {
+  background: #f0e6e0;
+  color: #5d4037;
+}
+
+.detail-table img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Đảm bảo modal và overlay ẩn mặc định */
+.modal,
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+}
+
+/* Khi add class .active thì hiện */
+.modal.active {
+  display: flex !important; /* dùng !important để override nếu cần */
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 1001; /* cao hơn overlay */
+}
+
+.overlay.active {
+  display: block !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+.action-icons i {
+  margin: 0 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+/* Nếu modal-content bị che, tăng z-index */
+.modal-content {
+  z-index: 1002;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 50%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+/* ================= FILTER BAR ================= */
+.filter-bar {
+  background: #fff8f5;
+  padding: 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  border: 1px solid #e5d6c8;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b4e31;
+}
+
+.filter-group input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c8b6a6;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: #8d6e63;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #6b4e31;
+}
+
+.btn-secondary {
+  background: #d7ccc8;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #bcaaa4;
+}
+.filter-group select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c8b6a6;
+  font-size: 14px;
+  min-width: 180px;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #8d6e63;
+}
+/* Căn giữa nội dung bảng chi tiết hóa đơn */
+.detail-table th,
+.detail-table td {
+  text-align: center;
+}
+/* Responsive */
+@media (max-width: 768px) {
+  .bills-table thead {
+    display: none;
+  }
+  .bills-table tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+  }
+  .bills-table td {
+    display: block;
+    text-align: right;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  .bills-table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    color: #6b4e31;
+  }
+  .bills-table td:last-child {
+    text-align: center;
+  }
+}
