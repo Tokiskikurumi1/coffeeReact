@@ -38,7 +38,7 @@ export default function Sidebar() {
           </li>
 
           <li>
-            <Link to="/admin/reports">
+            <Link to="/admin/Report">
               <i className="fa-solid fa-chart-line"></i>
               <span>Báo cáo doanh thu</span>
             </Link>
