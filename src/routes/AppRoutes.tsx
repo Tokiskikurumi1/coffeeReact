@@ -12,6 +12,7 @@ import AdminLayout from "../components/layout/AdminLayout";
 import Bills from "../pages/admin/Bill";
 import Customer from "../pages/admin/Customer";
 import Report from "../pages/admin/Report";
+import Staff from "../pages/admin/Staff";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -29,6 +30,7 @@ export default function AppRoutes() {
         <Route path="Bills" element={<Bills />} />
         <Route path="Report" element={<Report />} />
         <Route path="Customers" element={<Customer />} />
+        <Route path="Staff" element={<Staff />} />
       </Route>
     </Routes>
   );
