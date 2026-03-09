@@ -1,0 +1,4 @@
+.admin-layout,
+.admin-layout * :not(i) {
+  font-family: "Poppins", sans-serif !important;
+}
