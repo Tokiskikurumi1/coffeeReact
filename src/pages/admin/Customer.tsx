@@ -157,7 +157,7 @@ export default function Customer() {
               </select>
             </div>
 
-            <div className="filter-group">
+            <div className="filter-group" style={{ flexDirection: "row" }}>
               <button className="btn-primary" onClick={applyFilter}>
                 <i className="fas fa-filter"></i> Lọc
               </button>
