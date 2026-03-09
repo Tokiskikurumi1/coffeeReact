@@ -10,7 +10,7 @@ export default function ProductSection() {
 
   return (
     <div className="content products">
-      <h2>SẢN PHẨM CỦA CHÚNG TÔI</h2>
+      <h2 style={{ justifyContent: "center" }}>SẢN PHẨM CỦA CHÚNG TÔI</h2>
       <div className="product-content">
         {products.map((item) => (
           <ProductCard key={item.id} data={item} />

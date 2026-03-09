@@ -2,7 +2,9 @@ export default function Introduct() {
   return (
     <div id="container">
       <div className="content slogan">
-        <h2>Chào mừng đến với minh coffee</h2>
+        <h2 style={{ justifyContent: "center" }}>
+          Chào mừng đến với minh coffee
+        </h2>
         <p>"Hương vị đậm đà – Kết nối mọi khoảnh khắc!"</p>
       </div>
 

@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <div id="footer">
-      <h2>LIÊN HỆ</h2>
+      <h2 style={{ justifyContent: "center" }}>LIÊN HỆ</h2>
       <div className="footer-contact">
         <div className="content-footer">
           <h2>Coffee Shop</h2>
