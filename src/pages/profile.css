@@ -156,6 +156,44 @@ span,
   color: black;
 }
 
+.order-status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Chờ xác nhận */
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Đã xác nhận */
+.status-confirmed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Đang giao */
+.status-shipping {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* Đã giao */
+.status-delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Đã hủy */
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
 .order-product {
   display: flex;
   align-items: center;

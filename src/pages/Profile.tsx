@@ -15,7 +15,13 @@ export default function Profile() {
   const [showOrders, setShowOrders] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [status, setStatus] = useState("All");
-
+  const orderStatusList = [
+    { value: "All", label: "Tất cả" },
+    { value: "Pending", label: "Chờ xác nhận" },
+    { value: "Shipping", label: "Đang giao" },
+    { value: "Delivered", label: "Đã giao" },
+    { value: "Cancelled", label: "Đã hủy" },
+  ];
   // ================= TOGGLE SIDEBAR =================
   useEffect(() => {
     const body = document.body;
@@ -370,17 +376,15 @@ export default function Profile() {
                 </h2>
 
                 <div className="tab-bar">
-                  {["All", "Pending", "Shipping", "Delivered", "Cancelled"].map(
-                    (t) => (
-                      <div
-                        key={t}
-                        className={`tab ${status === t ? "active" : ""}`}
-                        onClick={() => filterOrders(t)}
-                      >
-                        {t}
-                      </div>
-                    ),
-                  )}
+                  {orderStatusList.map((s) => (
+                    <div
+                      key={s.value}
+                      className={`tab ${status === s.value ? "active" : ""}`}
+                      onClick={() => filterOrders(s.value)}
+                    >
+                      {s.label}
+                    </div>
+                  ))}
                 </div>
 
                 <div id="order-list">
@@ -395,7 +399,19 @@ export default function Profile() {
                       <div className="order-header">
                         <strong>#{o.billID}</strong>
 
-                        <span className={`order-status status-${o.status}`}>
+                        <span
+                          className={`order-status ${
+                            o.status === 0
+                              ? "status-pending"
+                              : o.status === 1
+                                ? "status-confirmed"
+                                : o.status === 2
+                                  ? "status-shipping"
+                                  : o.status === 3
+                                    ? "status-delivered"
+                                    : "status-cancelled"
+                          }`}
+                        >
                           {o.statusName}
                         </span>
                       </div>
