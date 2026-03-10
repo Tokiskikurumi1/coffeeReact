@@ -7,16 +7,16 @@ export default function Contact() {
       </div>
 
       <div className="content infor-contact">
-        <span>
-          <i className="fa-solid fa-map-location-dot"></i>Địa chỉ:Hòa Đam - Hòa
-          Phong - Mỹ Hào - Hưng Yên
+        <span style={{ color: "white" }}>
+          <i className="fa-solid fa-map-location-dot"></i>
+          Địa chỉ:Hòa Đam - Hòa Phong - Mỹ Hào - Hưng Yên
         </span>
         <br />
-        <span>
+        <span style={{ color: "white" }}>
           <i className="fa-solid fa-phone-volume"></i>Hotline: 0123456789
         </span>
         <br />
-        <span>
+        <span style={{ color: "white" }}>
           <i className="fa-solid fa-envelope"></i>Email:
           minhneahihi123@gmail.com
         </span>

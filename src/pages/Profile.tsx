@@ -174,6 +174,8 @@ export default function Profile() {
 
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
     window.location.href = "/login";
   };
 
@@ -183,6 +185,22 @@ export default function Profile() {
 
   const formatDate = (date: string) => new Date(date).toLocaleString("vi-VN");
 
+  const groupedBills = orders.reduce((acc: any, item: any) => {
+    if (!acc[item.billID]) {
+      acc[item.billID] = {
+        billDate: item.billDate,
+        status: item.status,
+        statusName: item.statusName,
+        products: [],
+        total: 0,
+      };
+    }
+
+    acc[item.billID].products.push(item);
+    acc[item.billID].total += item.subTotal;
+
+    return acc;
+  }, {});
   return (
     <div className="container">
       <button
@@ -394,63 +412,69 @@ export default function Profile() {
                     </p>
                   )}
 
-                  {orders.map((o: any) => (
-                    <div className="order-item" key={o.billID}>
-                      <div className="order-header">
-                        <strong>#{o.billID}</strong>
+                  {Object.keys(groupedBills).map((billID: any) => {
+                    const o = groupedBills[billID];
 
-                        <span
-                          className={`order-status ${
-                            o.status === 0
-                              ? "status-pending"
-                              : o.status === 1
-                                ? "status-confirmed"
-                                : o.status === 2
-                                  ? "status-shipping"
-                                  : o.status === 3
-                                    ? "status-delivered"
-                                    : "status-cancelled"
-                          }`}
-                        >
-                          {o.statusName}
-                        </span>
-                      </div>
+                    return (
+                      <div className="order-item" key={billID}>
+                        <div className="order-header">
+                          <strong>Mã hóa đơn: {billID}</strong>
 
-                      <p>
-                        <small>{formatDate(o.billDate)}</small>
-                      </p>
-
-                      <div className="order-product">
-                        <img src={PRODUCT_URL + o.imageURL} width="60" />
-
-                        <span className="span-bill">
-                          {o.coffeeName} x{o.quantity}
-                        </span>
-
-                        <span
-                          className="span-bill"
-                          style={{ marginLeft: "auto" }}
-                        >
-                          {formatMoney(o.subTotal)}
-                        </span>
-                      </div>
-
-                      <p className="order-total">
-                        <strong>{formatMoney(o.subTotal)}</strong>
-                      </p>
-
-                      {(o.status === 0 || o.status === 1) && (
-                        <div className="order-actions">
-                          <button
-                            className="cancel-btn"
-                            onClick={() => cancelOrder(o.billID)}
+                          <span
+                            className={`order-status ${
+                              o.status === 0
+                                ? "status-pending"
+                                : o.status === 1
+                                  ? "status-confirmed"
+                                  : o.status === 2
+                                    ? "status-shipping"
+                                    : o.status === 3
+                                      ? "status-delivered"
+                                      : "status-cancelled"
+                            }`}
                           >
-                            Hủy đơn
-                          </button>
+                            {o.statusName}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        <p>
+                          <small>{formatDate(o.billDate)}</small>
+                        </p>
+
+                        {o.products.map((p: any, index: number) => (
+                          <div className="order-product" key={index}>
+                            <img src={PRODUCT_URL + p.imageURL} width="60" />
+
+                            <span className="span-bill">
+                              {p.coffeeName} x{p.quantity}
+                            </span>
+
+                            <span
+                              className="span-bill"
+                              style={{ marginLeft: "auto" }}
+                            >
+                              {formatMoney(p.subTotal)}
+                            </span>
+                          </div>
+                        ))}
+
+                        <p className="order-total">
+                          <strong>{formatMoney(o.total)}</strong>
+                        </p>
+
+                        {(o.status === 0 || o.status === 1) && (
+                          <div className="order-actions">
+                            <button
+                              className="cancel-btn"
+                              onClick={() => cancelOrder(Number(billID))}
+                            >
+                              Hủy đơn
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

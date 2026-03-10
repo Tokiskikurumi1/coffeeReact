@@ -96,15 +96,15 @@ body.no-scroll {
   cursor: pointer;
 }
 
-.sidebar-menu a:hover,
+/* .sidebar-menu a:hover,
 .sidebar-menu a.active {
   background: #fff8f5;
   color: #6b4e31;
-}
+} */
 
-.sidebar-menu i {
+.sidebar-menu i.active {
   font-size: 1.4rem;
-  color: #8d6e63;
+  color: #fff8f5;
 }
 
 /* Nút toggle sidebar trên mobile */
@@ -407,7 +407,7 @@ body.no-scroll {
 @media (max-width: 992px) {
   .sidebar-profile {
     position: fixed;
-    top: 80px;
+    top: 70px;
     left: 0;
     height: 100%;
     transform: translateX(-100%);
