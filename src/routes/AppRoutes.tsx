@@ -13,6 +13,7 @@ import Bills from "../pages/admin/Bill";
 import Customer from "../pages/admin/Customer";
 import Report from "../pages/admin/Report";
 import Staff from "../pages/admin/Staff";
+import Profile from "../pages/Profile";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -24,6 +25,7 @@ export default function AppRoutes() {
         <Route path="products/:id" element={<ProductDetail />} />
         <Route path="contact" element={<Contact />} />
         <Route path="cart" element={<Cart />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="Dashboard" element={<Dashboard />} />

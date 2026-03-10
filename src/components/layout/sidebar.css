@@ -141,6 +141,18 @@
 }
 
 /* Khi sidebar active trên mobile, overlay hiện */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+}
+
 .overlay.active {
   display: block;
+}
+
+.sidebar-menu a.active {
+  background: #8b6b5a;
+  color: white;
 }

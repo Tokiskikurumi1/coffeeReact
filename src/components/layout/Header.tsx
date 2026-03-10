@@ -27,10 +27,10 @@ export default function Header() {
       <div className="login-table">
         {currentUser ? (
           <span>
-            Chào mừng: {currentUser} |{" "}
-            <a href="#" onClick={handleLogout}>
+            Chào mừng: <Link to="/profile">{currentUser}</Link> |
+            <Link to="/#" onClick={handleLogout}>
               Đăng xuất
-            </a>
+            </Link>
           </span>
         ) : (
           <span>
