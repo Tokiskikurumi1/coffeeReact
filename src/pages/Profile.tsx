@@ -11,21 +11,23 @@ export default function Profile() {
   const [profile, setProfile] = useState<any>({});
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState("");
-
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [showOrders, setShowOrders] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [status, setStatus] = useState("All");
 
   // ================= TOGGLE SIDEBAR =================
   useEffect(() => {
+    const body = document.body;
+
     if (sidebarOpen) {
-      document.body.classList.add("no-scroll");
+      body.classList.add("no-scroll");
     } else {
-      document.body.classList.remove("no-scroll");
+      body.classList.remove("no-scroll");
     }
 
     return () => {
-      document.body.classList.remove("no-scroll");
+      body.classList.remove("no-scroll");
     };
   }, [sidebarOpen]);
 
@@ -73,7 +75,7 @@ export default function Profile() {
     const reader = new FileReader();
 
     reader.onload = (ev: any) => {
-      setAvatarUrl(ev.target.result);
+      setAvatarPreview(ev.target.result);
     };
 
     reader.readAsDataURL(file);
@@ -124,6 +126,8 @@ export default function Profile() {
     alert(message);
 
     loadProfile();
+    setAvatarPreview("");
+    setAvatarFile(null);
   };
 
   // ================= LOAD ORDERS =================
@@ -175,7 +179,10 @@ export default function Profile() {
 
   return (
     <div className="container">
-      <button className="sidebar-toggle" onClick={() => setSidebarOpen(true)}>
+      <button
+        className="sidebar-toggle"
+        onClick={() => setSidebarOpen((prev) => !prev)}
+      >
         <i className="fas fa-bars"></i>
       </button>
       <div>
@@ -201,7 +208,10 @@ export default function Profile() {
               <li>
                 <a
                   className={!showOrders ? "active" : ""}
-                  onClick={() => setShowOrders(false)}
+                  onClick={() => {
+                    setShowOrders(false);
+                    setSidebarOpen(false);
+                  }}
                 >
                   <i className="fas fa-user-circle"></i> Thông tin cá nhân
                 </a>
@@ -213,6 +223,7 @@ export default function Profile() {
                   onClick={() => {
                     setShowOrders(true);
                     renderOrders("All");
+                    setSidebarOpen(false);
                   }}
                 >
                   <i className="fas fa-receipt"></i> Hóa đơn của tôi
@@ -322,8 +333,8 @@ export default function Profile() {
                     <img
                       id="previewAvatar"
                       src={
-                        avatarFile
-                          ? avatarUrl
+                        avatarPreview
+                          ? avatarPreview
                           : avatarUrl
                             ? BASE_URL + avatarUrl
                             : "https://i.pravatar.cc/200"
