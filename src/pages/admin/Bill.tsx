@@ -12,7 +12,8 @@ export default function Bills() {
   const [toDate, setToDate] = useState("");
   const [totalRange, setTotalRange] = useState("");
 
-  const [billDetail, setBillDetail] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
 
   // ================= LOAD BILL =================
@@ -40,8 +41,29 @@ export default function Bills() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN");
+    return new Date(dateString).toLocaleDateString("vi-VN");
+  };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatAction = (action: string) => {
+    switch (action) {
+      case "CONFIRM":
+        return "xác nhận đơn";
+      case "SHIPPING":
+        return "đang giao hàng";
+      case "DELIVERED":
+        return "giao thành công";
+      case "CANCEL":
+        return "hủy đơn";
+      default:
+        return action;
+    }
   };
 
   // ================= VIEW DETAIL =================
@@ -49,24 +71,28 @@ export default function Bills() {
   const viewBillDetail = async (id: number) => {
     try {
       const res = await fetch(`${API_BASE}/get-bill-by-id/${id}`);
+
+      if (!res.ok) return;
+
       const data = await res.json();
 
-      if (!data || data.length === 0) {
+      if (!data || !data.products) {
         alert("Không tìm thấy hóa đơn");
         return;
       }
 
-      setBillDetail(data);
+      setProducts(data.products);
+      setLogs(data.logs || []);
       setShowModal(true);
     } catch {
-      console.log("Lỗi load chi tiết hóa đơn");
+      console.log("Lỗi chi tiết hóa đơn");
     }
   };
 
   // ================= DELETE =================
 
   const deleteBill = async (id: number) => {
-    if (!confirm("Bạn có chắc muốn xóa hóa đơn?")) return;
+    if (!confirm("Bạn có chắc muốn xóa hóa đơn này?")) return;
 
     try {
       const res = await fetch(`${API_BASE}/delete-bill/${id}`, {
@@ -80,7 +106,7 @@ export default function Bills() {
         alert("Xóa thất bại");
       }
     } catch {
-      console.log("Lỗi delete bill");
+      console.log("Lỗi xóa hóa đơn");
     }
   };
 
@@ -126,6 +152,8 @@ export default function Bills() {
     setTotalRange("");
     setBills(allBills);
   };
+
+  const bill = products[0];
 
   // ================= UI =================
 
@@ -214,7 +242,7 @@ export default function Bills() {
                       {bill.status === 1 ? "Đã thanh toán" : "Chưa thanh toán"}
                     </td>
 
-                    <td className="actions-icons">
+                    <td>
                       <i
                         className="fas fa-eye action-icon view"
                         onClick={() => viewBillDetail(bill.billID)}
@@ -235,71 +263,98 @@ export default function Bills() {
 
       {/* MODAL */}
 
-      {showModal && billDetail.length > 0 && (
-        <div className="modal" style={{ display: "flex" }}>
-          <div className="modal-content">
-            <span className="close-btn" onClick={() => setShowModal(false)}>
-              &times;
-            </span>
+      {showModal && bill && (
+        <>
+          <div className="overlay" onClick={() => setShowModal(false)}></div>
 
-            <h2>
-              <i className="fas fa-file-invoice-dollar"></i> Chi tiết hóa đơn #
-              {billDetail[0].billID}
-            </h2>
+          <div className="modal active">
+            <div className="modal-content">
+              <span className="close-btn" onClick={() => setShowModal(false)}>
+                ×
+              </span>
 
-            <div className="bill-info">
-              <p>
-                <strong>Ngày lập:</strong> {formatDate(billDetail[0].billDate)}
-              </p>
+              <h2>
+                <i className="fas fa-file-invoice-dollar"></i>
+                Chi tiết hóa đơn #{bill.billID}
+              </h2>
 
-              <p>
-                <strong>Khách hàng:</strong> {billDetail[0].fullName}
-              </p>
+              <div className="bill-info">
+                <p>
+                  <strong>Ngày lập:</strong> {formatDate(bill.billDate)}
+                </p>
 
-              <p>
-                <strong>SĐT:</strong> {billDetail[0].phone}
-              </p>
+                <p>
+                  <strong>Khách hàng:</strong> {bill.customerName}
+                </p>
 
-              <p>
-                <strong>Tổng tiền:</strong>{" "}
-                {formatMoney(billDetail[0].totalAmount)}
-              </p>
-            </div>
+                <p>
+                  <strong>SĐT:</strong> {bill.phone}
+                </p>
 
-            <table className="detail-table">
-              <thead>
-                <tr>
-                  <th>Tên sản phẩm</th>
-                  <th>Số lượng</th>
-                  <th>Giá</th>
-                </tr>
-              </thead>
+                <p>
+                  <strong>Tổng tiền:</strong> {formatMoney(bill.totalAmount)}
+                </p>
+              </div>
 
-              <tbody>
-                {billDetail.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.coffeeName}</td>
-                    <td>{item.quantity}</td>
-                    <td>{formatMoney(item.unitPrice)}</td>
+              {/* PRODUCTS */}
+
+              <table className="detail-table">
+                <thead>
+                  <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
 
-            <div style={{ marginTop: 15 }}>
-              Tổng tiền: {formatMoney(billDetail[0].totalAmount)}
-            </div>
+                <tbody>
+                  {products.map((item, i) => (
+                    <tr key={i}>
+                      <td>{item.coffeeName}</td>
+                      <td>{item.quantity}</td>
+                      <td>{formatMoney(item.unitPrice)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-            <div className="modal-actions">
-              <button
-                className="btn-secondary"
-                onClick={() => setShowModal(false)}
-              >
-                Đóng
-              </button>
+              <span>Tổng tiền: {formatMoney(bill.totalAmount)}</span>
+
+              {/* LOG HISTORY */}
+
+              <div className="bill-history">
+                <h3>Lịch sử xử lý</h3>
+
+                {logs.length === 0 ? (
+                  <p>Chưa có lịch sử xử lý</p>
+                ) : (
+                  logs.map((log, i) => (
+                    <div key={i} className="history-item">
+                      <span className="history-time">
+                        {formatTime(log.actionTime)}
+                      </span>
+
+                      <span className="history-staff">{log.staffName}</span>
+
+                      <span className="history-action">
+                        {formatAction(log.actionType)}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  className="btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

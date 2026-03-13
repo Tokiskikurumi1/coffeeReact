@@ -180,7 +180,10 @@ export default function Product() {
           </div>
 
           {/* PAGINATION */}
-          <div className="pagination">
+          <div
+            className="pagination"
+            style={{ textAlign: "center", marginTop: "auto" }}
+          >
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((prev) => prev - 1)}
