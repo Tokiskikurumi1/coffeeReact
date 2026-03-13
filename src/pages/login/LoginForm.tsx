@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import "./login.css";
 
 const API_BASE = "https://localhost:7161/api";
 
@@ -30,20 +29,31 @@ export default function LoginForm() {
         }),
       });
 
+      const data = await res.json(); // parse JSON trước
+
       if (!res.ok) {
-        alert("Sai tài khoản hoặc mật khẩu");
+        alert(data.message || "Sai tài khoản hoặc mật khẩu");
         return;
       }
 
-      const data = await res.json();
-
+      // lưu localStorage
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("role", data.role);
       localStorage.setItem("user", data.user);
 
       alert("Đăng nhập thành công");
 
-      navigate("/"); // về trang chủ
+      // =====================
+      // CHECK ROLE
+      // =====================
+
+      if (data.role === "Nhân viên") {
+        navigate("/staff/dashboard");
+      } else if (data.role === "Khách hàng") {
+        navigate("/");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       console.error(err);
       alert("Không kết nối được server");
@@ -60,6 +70,7 @@ export default function LoginForm() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
+
         <label className="label">Tài khoản</label>
       </div>
 
@@ -71,6 +82,7 @@ export default function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
         <label className="label">Mật khẩu</label>
       </div>
 
