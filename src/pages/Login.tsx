@@ -53,7 +53,11 @@ export default function Login() {
       localStorage.setItem("user", data.user);
 
       alert("Đăng nhập thành công");
-      window.location.href = "/";
+      if (data.role === "Khách hàng") {
+        window.location.href = "/";
+      } else if (data.role === "Nhân viên") {
+        window.location.href = "/staff/dashboard";
+      }
     } catch {
       alert("Không kết nối được server");
     }

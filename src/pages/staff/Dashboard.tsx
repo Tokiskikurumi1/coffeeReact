@@ -51,8 +51,6 @@ export default function StaffDashboard() {
 
   return (
     <>
-      <Sidebar />
-
       <div className="page-content">
         {/* HEADER */}
 

@@ -17,7 +17,7 @@ import Profile from "../pages/Profile";
 
 import StaffLayout from "../components/layout/StaffLayout";
 import StaffDashboard from "../pages/staff/Dashboard";
-
+import RequestBill from "../pages/staff/BillRequest";
 export default function AppRoutes() {
   return (
     <Routes>
@@ -43,6 +43,7 @@ export default function AppRoutes() {
       {/* Staff Routes */}
       <Route path="/staff" element={<StaffLayout />}>
         <Route path="Dashboard" element={<StaffDashboard />}></Route>
+        <Route path="RequestBills" element={<RequestBill />}></Route>
       </Route>
     </Routes>
   );

@@ -35,7 +35,11 @@ export default function Sidebar() {
           Dashboard
         </Link>
 
-        <Link to="/staff/bills" className="sidebar-link" onClick={closeSidebar}>
+        <Link
+          to="/staff/requestBills"
+          className="sidebar-link"
+          onClick={closeSidebar}
+        >
           Quản lý hóa đơn
         </Link>
 
