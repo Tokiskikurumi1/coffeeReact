@@ -16,7 +16,9 @@ export default function Bills() {
   const [logs, setLogs] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
 
-  // ================= LOAD BILL =================
+  const bill = products[0];
+
+  /* ================= LOAD BILL ================= */
 
   useEffect(() => {
     loadBills();
@@ -34,24 +36,41 @@ export default function Bills() {
     }
   };
 
-  // ================= FORMAT =================
+  /* ================= STATUS ================= */
 
-  const formatMoney = (number: number) => {
+  const getStatusText = (status: any) => {
+    switch (status) {
+      case 1:
+        return "Chờ xác nhận";
+      case 2:
+        return "Chờ giao";
+      case 3:
+        return "Đã giao";
+      case 4:
+        return "Đã hủy";
+      default:
+        return "Không xác định";
+    }
+  };
+
+  /* ================= FORMAT ================= */
+
+  const formatMoney = (number: any) => {
     return number.toLocaleString("vi-VN") + " đ";
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN");
+  const formatDate = (date: any) => {
+    return new Date(date).toLocaleDateString("vi-VN");
   };
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("vi-VN", {
+  const formatTime = (date: any) => {
+    return new Date(date).toLocaleTimeString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
     });
   };
 
-  const formatAction = (action: string) => {
+  const formatAction = (action: any) => {
     switch (action) {
       case "CONFIRM":
         return "xác nhận đơn";
@@ -66,7 +85,7 @@ export default function Bills() {
     }
   };
 
-  // ================= VIEW DETAIL =================
+  /* ================= VIEW DETAIL ================= */
 
   const viewBillDetail = async (id: number) => {
     try {
@@ -89,10 +108,10 @@ export default function Bills() {
     }
   };
 
-  // ================= DELETE =================
+  /* ================= DELETE ================= */
 
   const deleteBill = async (id: number) => {
-    if (!confirm("Bạn có chắc muốn xóa hóa đơn này?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa hóa đơn này?")) return;
 
     try {
       const res = await fetch(`${API_BASE}/delete-bill/${id}`, {
@@ -110,7 +129,7 @@ export default function Bills() {
     }
   };
 
-  // ================= FILTER =================
+  /* ================= FILTER ================= */
 
   const filterBills = () => {
     const filtered = allBills.filter((bill) => {
@@ -153,9 +172,7 @@ export default function Bills() {
     setBills(allBills);
   };
 
-  const bill = products[0];
-
-  // ================= UI =================
+  /* ================= UI ================= */
 
   return (
     <div id="right-content">
@@ -238,9 +255,7 @@ export default function Bills() {
 
                     <td>{formatMoney(bill.totalAmount)}</td>
 
-                    <td>
-                      {bill.status === 1 ? "Đã thanh toán" : "Chưa thanh toán"}
-                    </td>
+                    <td>{getStatusText(bill.status)}</td>
 
                     <td>
                       <i
@@ -296,8 +311,6 @@ export default function Bills() {
                 </p>
               </div>
 
-              {/* PRODUCTS */}
-
               <table className="detail-table">
                 <thead>
                   <tr>
@@ -319,8 +332,6 @@ export default function Bills() {
               </table>
 
               <span>Tổng tiền: {formatMoney(bill.totalAmount)}</span>
-
-              {/* LOG HISTORY */}
 
               <div className="bill-history">
                 <h3>Lịch sử xử lý</h3>
