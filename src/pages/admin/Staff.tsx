@@ -9,6 +9,9 @@ export default function Staff() {
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
 
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
   const [form, setForm] = useState({
     username: "",
     passwordHash: "",
@@ -169,6 +172,15 @@ export default function Staff() {
     });
   };
 
+  /* ================= PAGINATION ================= */
+
+  const totalPages = Math.ceil(staffList.length / pageSize);
+
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  const currentStaff = staffList.slice(start, end);
+
   return (
     <div id="right-content">
       <main className="admin-main">
@@ -260,23 +272,36 @@ export default function Staff() {
               </thead>
 
               <tbody>
-                {staffList.map((s: any, i) => (
+                {currentStaff.map((s: any, i) => (
                   <tr key={s.userID}>
-                    <td>{i + 1}</td>
+                    <td>{start + i + 1}</td>
                     <td>{s.fullName}</td>
                     <td>{s.gender}</td>
                     <td>{s.address}</td>
                     <td>{s.phone}</td>
                     <td>{s.email}</td>
                     <td>{formatDate(s.createdAt)}</td>
-                    <td>{s.status === 1 ? "Hoạt động" : "Ngừng"}</td>
+                    <td
+                      style={{
+                        color: s.status === 1 ? "green" : "red",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {s.status === 1 ? <>Hoạt động</> : <>Đã khóa</>}
+                    </td>
 
                     <td>
                       <button onClick={() => openEdit(s.userID)}>
                         <i className="fas fa-edit"></i>
                       </button>
 
-                      <button onClick={() => changeStatus(s.userID, s.status)}>
+                      <button
+                        style={{
+                          margin: "5px",
+                          color: s.status === 1 ? "green" : "red",
+                        }}
+                        onClick={() => changeStatus(s.userID, s.status)}
+                      >
                         <i
                           className={`fas ${s.status === 1 ? "fa-toggle-on" : "fa-toggle-off"}`}
                         ></i>
@@ -290,6 +315,27 @@ export default function Staff() {
                 ))}
               </tbody>
             </table>
+            <div style={{ marginTop: 20, textAlign: "center" }}>
+              <button
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                style={{ marginRight: 10, padding: "5px 10px" }}
+              >
+                {"<"}
+              </button>
+
+              <span style={{ fontWeight: "bold", margin: "0 10px" }}>
+                Trang {page} / {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages}
+                style={{ marginLeft: 10, padding: "5px 10px" }}
+              >
+                {">"}
+              </button>
+            </div>
           </div>
         </section>
 

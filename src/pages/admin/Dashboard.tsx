@@ -403,7 +403,10 @@ export default function Dashboard() {
                           <i className="fas fa-edit"></i>
                         </button>
 
-                        <button onClick={() => deleteProduct(p.coffeeID)}>
+                        <button
+                          style={{ margin: "5px" }}
+                          onClick={() => deleteProduct(p.coffeeID)}
+                        >
                           <i className="fas fa-trash"></i>
                         </button>
 
@@ -430,21 +433,26 @@ export default function Dashboard() {
 
           {/* PAGINATION */}
 
-          <div style={{ marginTop: 20 }}>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i + 1)}
-                style={{
-                  marginRight: 5,
-                  background: page === i + 1 ? "#333" : "#ddd",
-                  color: page === i + 1 ? "#fff" : "#000",
-                  padding: "5px 10px",
-                }}
-              >
-                {i + 1}
-              </button>
-            ))}
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page === 1}
+              style={{ marginRight: 10, padding: "5px 10px" }}
+            >
+              {"<"}
+            </button>
+
+            <span style={{ fontWeight: "bold", margin: "0 10px" }}>
+              {page} / {totalPages}
+            </span>
+
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={page === totalPages}
+              style={{ marginLeft: 10, padding: "5px 10px" }}
+            >
+              {">"}
+            </button>
           </div>
         </section>
       </main>

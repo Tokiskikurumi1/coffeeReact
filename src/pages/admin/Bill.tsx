@@ -16,6 +16,9 @@ export default function Bills() {
   const [logs, setLogs] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
 
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
   const bill = products[0];
 
   /* ================= LOAD BILL ================= */
@@ -163,6 +166,7 @@ export default function Bills() {
     });
 
     setBills(filtered);
+    setPage(1);
   };
 
   const resetFilter = () => {
@@ -170,7 +174,17 @@ export default function Bills() {
     setToDate("");
     setTotalRange("");
     setBills(allBills);
+    setPage(1);
   };
+
+  /* ================= PAGINATION ================= */
+
+  const totalPages = Math.ceil(bills.length / pageSize);
+
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  const currentBills = bills.slice(start, end);
 
   /* ================= UI ================= */
 
@@ -245,9 +259,9 @@ export default function Bills() {
               </thead>
 
               <tbody>
-                {bills.map((bill, index) => (
+                {currentBills.map((bill, index) => (
                   <tr key={bill.billID}>
-                    <td>{index + 1}</td>
+                    <td>{start + index + 1}</td>
 
                     <td>#{bill.billID}</td>
 
@@ -259,6 +273,7 @@ export default function Bills() {
 
                     <td>
                       <i
+                        style={{ marginRight: "5px" }}
                         className="fas fa-eye action-icon view"
                         onClick={() => viewBillDetail(bill.billID)}
                       ></i>
@@ -272,6 +287,27 @@ export default function Bills() {
                 ))}
               </tbody>
             </table>
+            <div style={{ marginTop: 20, textAlign: "center" }}>
+              <button
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                style={{ marginRight: 10, padding: "5px 10px" }}
+              >
+                {"<"}
+              </button>
+
+              <span style={{ fontWeight: "bold", margin: "0 10px" }}>
+                Trang {page} / {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages}
+                style={{ marginLeft: 10, padding: "5px 10px" }}
+              >
+                {">"}
+              </button>
+            </div>
           </div>
         </section>
       </main>
@@ -357,6 +393,7 @@ export default function Bills() {
 
               <div className="modal-actions">
                 <button
+                  style={{ backgroundColor: "#6b4e31", color: "#fff" }}
                   className="btn-secondary"
                   onClick={() => setShowModal(false)}
                 >

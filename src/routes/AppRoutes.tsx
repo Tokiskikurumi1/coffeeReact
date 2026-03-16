@@ -34,16 +34,16 @@ export default function AppRoutes() {
       </Route>
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route path="Dashboard" element={<Dashboard />} />
-        <Route path="Bills" element={<Bills />} />
-        <Route path="Report" element={<Report />} />
-        <Route path="Customers" element={<Customer />} />
-        <Route path="Staff" element={<Staff />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="bills" element={<Bills />} />
+        <Route path="report" element={<Report />} />
+        <Route path="customers" element={<Customer />} />
+        <Route path="staff" element={<Staff />} />
       </Route>
       {/* Staff Routes */}
       <Route path="/staff" element={<StaffLayout />}>
-        <Route path="Dashboard" element={<StaffDashboard />}></Route>
-        <Route path="RequestBills" element={<RequestBill />}></Route>
+        <Route path="dashboard" element={<StaffDashboard />}></Route>
+        <Route path="requestBills" element={<RequestBill />}></Route>
       </Route>
     </Routes>
   );

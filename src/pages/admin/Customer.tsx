@@ -14,6 +14,11 @@ export default function Customer() {
   const [customerDetail, setCustomerDetail] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
 
+  const formatGender = (gender: string) =>
+    gender === "male" ? "Nam" : gender === "female" ? "Nữ" : "Chưa cập nhật";
+
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   // ================= LOAD =================
 
   useEffect(() => {
@@ -63,12 +68,14 @@ export default function Customer() {
     }
 
     setCustomers(filtered);
+    setPage(1);
   };
 
   const resetFilter = () => {
     setSearchName("");
     setStatusFilter("");
     setCustomers(allCustomers);
+    setPage(1);
   };
 
   // ================= VIEW DETAIL =================
@@ -119,6 +126,15 @@ export default function Customer() {
       alert(err.message);
     }
   };
+
+  /* ================= PAGINATION ================= */
+
+  const totalPages = Math.ceil(customers.length / pageSize);
+
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  const currentCustomers = customers.slice(start, end);
 
   // ================= UI =================
 
@@ -194,9 +210,9 @@ export default function Customer() {
                     </td>
                   </tr>
                 ) : (
-                  customers.map((c, index) => (
+                  currentCustomers.map((c, index) => (
                     <tr key={c.userID}>
-                      <td>{index + 1}</td>
+                      <td>{start + index + 1}</td>
 
                       <td>{displayValue(c.fullName)}</td>
 
@@ -231,6 +247,27 @@ export default function Customer() {
                 )}
               </tbody>
             </table>
+            <div style={{ marginTop: 20, textAlign: "center" }}>
+              <button
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                style={{ marginRight: 10, padding: "5px 10px" }}
+              >
+                {"<"}
+              </button>
+
+              <span style={{ fontWeight: "bold", margin: "0 10px" }}>
+                Trang {page} / {totalPages}
+              </span>
+
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages}
+                style={{ marginLeft: 10, padding: "5px 10px" }}
+              >
+                {">"}
+              </button>
+            </div>
           </div>
         </section>
       </main>
@@ -240,44 +277,47 @@ export default function Customer() {
       {showModal && customerDetail && (
         <div className="modal" style={{ display: "flex" }}>
           <div className="modal-content">
-            <h3>Thông tin khách hàng</h3>
+            <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
+              Thông tin khách hàng
+            </h3>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Tên khách hàng:</strong>{" "}
               {displayValue(customerDetail.fullName)}
             </p>
 
-            <p>
-              <strong>Giới tính:</strong> {displayValue(customerDetail.gender)}
+            <p style={{ marginBottom: "5px" }}>
+              <strong>Giới tính:</strong> {formatGender(customerDetail.gender)}
             </p>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Địa chỉ:</strong> {displayValue(customerDetail.address)}
             </p>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Số điện thoại:</strong>{" "}
               {displayValue(customerDetail.phone)}
             </p>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Email:</strong> {displayValue(customerDetail.email)}
             </p>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Ngày tạo:</strong>{" "}
               {customerDetail.createdAt
                 ? new Date(customerDetail.createdAt).toLocaleDateString()
                 : "Chưa cập nhật"}
             </p>
 
-            <p>
+            <p style={{ marginBottom: "5px" }}>
               <strong>Trạng thái:</strong>{" "}
               {customerDetail.status === 1 ? "Đang hoạt động" : "Đã bị khóa"}
             </p>
 
             <div className="modal-actions">
               <button
+                style={{ backgroundColor: "#6b4e31", color: "#fff" }}
                 className="btn-secondary"
                 onClick={() => setShowModal(false)}
               >
