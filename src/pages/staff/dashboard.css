@@ -39,6 +39,11 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+
+  background: #fff8f5;
+  padding: 18px;
+  border-radius: 10px;
+  border: 1px solid #e5d6c8;
 }
 
 .dashboard-filter select,

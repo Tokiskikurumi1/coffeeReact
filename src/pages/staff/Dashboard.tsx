@@ -1,139 +1,206 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
-import Sidebar from "../../components/layout/SidebarStaff";
-
 import "./dashboard.css";
 
+const API = "https://localhost:7203/api/DashBoard/dashboard";
+
 export default function StaffDashboard() {
+  const [summary, setSummary] = useState<any>({});
+  const [statusChart, setStatusChart] = useState<any[]>([]);
+  const [revenueChart, setRevenueChart] = useState<any[]>([]);
+
+  const [type, setType] = useState("ALL");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const orderChartRef = useRef<any>(null);
+  const revenueChartRef = useRef<any>(null);
+
+  const total = statusChart.reduce((sum, x) => sum + x.total, 0);
+  const percentData = statusChart.map((x) =>
+    total === 0 ? 0 : ((x.total / total) * 100).toFixed(2),
+  );
+  // ================= CALL API =================
+  const fetchDashboard = () => {
+    let url = `${API}?type=${type}`;
+
+    if (type === "RANGE") {
+      url += `&fromDate=${fromDate}&toDate=${toDate}`;
+    }
+
+    fetch(url, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setSummary(data.summary);
+        setStatusChart(data.statusChart);
+        setRevenueChart(data.revenueChart);
+      });
+  };
+
   useEffect(() => {
-    const orderCtx = document.getElementById("orderChart") as HTMLCanvasElement;
-
-    new Chart(orderCtx, {
-      type: "doughnut",
-      data: {
-        labels: ["Chờ xác nhận", "Đang giao", "Hoàn thành"],
-        datasets: [
-          {
-            data: [5, 8, 6],
-            backgroundColor: ["#3498db", "#f06292", "#f39c12"],
-            borderWidth: 0,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    });
-
-    const revenueCtx = document.getElementById(
-      "revenueChart",
-    ) as HTMLCanvasElement;
-
-    new Chart(revenueCtx, {
-      type: "pie",
-      data: {
-        labels: ["Cà phê", "Trà", "Bánh"],
-        datasets: [
-          {
-            data: [3200000, 1200000, 800000],
-            backgroundColor: ["#3498db", "#f06292", "#f39c12"],
-            borderWidth: 0,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-      },
-    });
+    fetchDashboard();
   }, []);
 
+  // ================= RENDER CHART =================
+  useEffect(() => {
+    if (!statusChart.length) return;
+
+    const ctx = document.getElementById("orderChart");
+
+    if (orderChartRef.current) {
+      orderChartRef.current.destroy();
+    }
+
+    orderChartRef.current = new Chart(ctx as any, {
+      type: "doughnut",
+      data: {
+        labels: statusChart.map((x) => x.statusName),
+        datasets: [
+          {
+            data: percentData,
+            backgroundColor: ["#3498db", "#f06292", "#f39c12", "#e74c3c"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    });
+  }, [statusChart]);
+
+  useEffect(() => {
+    if (!revenueChart.length) return;
+
+    const ctx = document.getElementById("revenueChart");
+
+    if (revenueChartRef.current) {
+      revenueChartRef.current.destroy();
+    }
+
+    revenueChartRef.current = new Chart(ctx as any, {
+      type: "pie",
+      data: {
+        labels: revenueChart.map((x) => x.categoryName), // 👈 dynamic
+        datasets: [
+          {
+            data: revenueChart.map((x) => x.revenue), // 👈 dynamic
+            backgroundColor: ["#3498db", "#f06292", "#f39c12"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    });
+  }, [revenueChart]);
+
+  // ================= FILTER =================
+  const handleFilter = () => {
+    // 👉 chỉ check khi dùng RANGE
+    if (type === "RANGE") {
+      if (!fromDate || !toDate) {
+        alert("Vui lòng chọn đầy đủ ngày");
+        return;
+      }
+
+      if (new Date(toDate) < new Date(fromDate)) {
+        alert("Ngày đến phải lớn hơn hoặc bằng ngày bắt đầu");
+        return;
+      }
+    }
+
+    fetchDashboard();
+  };
+
+  const handleReset = () => {
+    setType("ALL");
+    setFromDate("");
+    setToDate("");
+    setTimeout(fetchDashboard, 0);
+  };
+
   return (
-    <>
-      <div className="page-content">
-        {/* HEADER */}
+    <div className="page-content">
+      <div className="dashboard-header">
+        <h2>Coffee Dashboard</h2>
+      </div>
 
-        <div className="dashboard-header">
-          <div className="header-title">
-            <i className="fa-solid fa-mug-saucer coffee-icon"></i>
-            <h2>Coffee Dashboard</h2>
+      {/* FILTER */}
+      <div className="dashboard-filter">
+        <select value={type} onChange={(e) => setType(e.target.value)}>
+          <option value="ALL">Tất cả</option>
+          <option value="DAY">Hôm nay</option>
+          <option value="WEEK">Tuần này</option>
+          <option value="MONTH">Tháng này</option>
+          <option value="RANGE">Khoảng ngày</option>
+        </select>
+
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+        />
+
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+        />
+
+        <button onClick={handleFilter}>Lọc</button>
+        <button onClick={handleReset}>Reset</button>
+      </div>
+
+      {/* CARDS */}
+      <div className="dashboard-cards">
+        <div className="dashboard-card">
+          <h3>{summary.totalOrders || 0}</h3>
+          <p>Tất cả đơn</p>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>{summary.pending || 0}</h3>
+          <p>Chờ xác nhận</p>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>{summary.shipping || 0}</h3>
+          <p>Đang giao</p>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>{summary.completed || 0}</h3>
+          <p>Hoàn thành</p>
+        </div>
+
+        <div className="dashboard-card">
+          <h3>{summary.cancelled || 0}</h3>
+          <p>Đã hủy</p>
+        </div>
+      </div>
+
+      {/* CHART */}
+      <div className="charts-wrapper">
+        <div className="chart-card">
+          <h3>Trạng thái đơn</h3>
+          <div className="chart-box">
+            <canvas id="orderChart"></canvas>
           </div>
         </div>
 
-        {/* FILTER */}
-
-        <div className="dashboard-filter">
-          <select>
-            <option>Tất cả</option>
-            <option>Hôm nay</option>
-            <option>Tuần này</option>
-            <option>Tháng này</option>
-          </select>
-
-          <label>Từ</label>
-          <input type="date" />
-
-          <label>Đến</label>
-          <input type="date" />
-
-          <button>
-            <i className="fa-solid fa-filter"></i> Lọc
-          </button>
-        </div>
-
-        {/* CARDS */}
-
-        <div className="dashboard-cards">
-          <div className="dashboard-card">
-            <i className="fa-solid fa-receipt icon"></i>
-            <h3>10</h3>
-            <p>Tất cả đơn</p>
-          </div>
-
-          <div className="dashboard-card">
-            <i className="fa-solid fa-hourglass-half icon"></i>
-            <h3>3</h3>
-            <p>Chờ xác nhận</p>
-          </div>
-
-          <div className="dashboard-card">
-            <i className="fa-solid fa-truck-fast icon"></i>
-            <h3>4</h3>
-            <p>Đang giao</p>
-          </div>
-
-          <div className="dashboard-card">
-            <i className="fa-solid fa-check-circle icon"></i>
-            <h3>3</h3>
-            <p>Hoàn thành</p>
-          </div>
-        </div>
-
-        {/* CHARTS */}
-
-        <div className="charts-wrapper">
-          <div className="chart-card">
-            <h3>
-              <i className="fa-solid fa-chart-pie"></i> Trạng thái đơn
-            </h3>
-
-            <div className="chart-area">
-              <canvas id="orderChart"></canvas>
-            </div>
-          </div>
-
-          <div className="chart-card">
-            <h3>
-              <i className="fa-solid fa-coins"></i> Doanh thu
-            </h3>
-
-            <div className="chart-area">
-              <canvas id="revenueChart"></canvas>
-            </div>
+        <div className="chart-card">
+          <h3>Doanh thu</h3>
+          <div className="chart-box">
+            <canvas id="revenueChart"></canvas>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
