@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import "./billrequest.css"; // Giả sử bạn đã tạo file CSS này
 
@@ -42,6 +42,8 @@ export default function ManageBill() {
   const [toDate, setToDate] = useState("");
   const [sortTime, setSortTime] = useState("new");
 
+  const prevMaxId = useRef<number | null>(null);
+  const isInitialMount = useRef(true);
   const pageSize = 10;
 
   // --- Helpers ---
@@ -72,7 +74,9 @@ export default function ManageBill() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data: Bill[] = await res.json();
-      setBills(data);
+
+      // ÉP React nhận state mới
+      setBills([...data]);
     } catch (err) {
       console.error(err);
     }
@@ -99,8 +103,41 @@ export default function ManageBill() {
 
   // --- Effects ---
   useEffect(() => {
-    loadBills();
+    loadBills(); // Tải dữ liệu lần đầu
+
+    // Thiết lập một interval để kiểm tra hóa đơn mới mỗi 5 giây
+    const interval = setInterval(() => {
+      loadBills();
+    }, 5000); // 5000ms = 5 giây
+
+    // Dọn dẹp interval khi component bị unmount
+    return () => clearInterval(interval);
   }, []);
+
+  // *** LOGIC MỚI: Hiển thị toast khi có hóa đơn mới ***
+  useEffect(() => {
+    if (bills.length === 0) return;
+
+    const currentMaxId = Math.max(...bills.map((b) => b.billID));
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      prevMaxId.current = currentMaxId;
+      return;
+    }
+
+    if (prevMaxId.current !== null && currentMaxId > prevMaxId.current) {
+      const toast = document.getElementById("orderToast");
+      if (toast) {
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
+    }
+
+    prevMaxId.current = currentMaxId;
+  }, [bills]);
 
   useEffect(() => {
     let tempBills = [...bills];
@@ -224,158 +261,166 @@ export default function ManageBill() {
   );
 
   return (
-    <div className="page-content">
-      <div className="dashboard-header">
-        <div className="header-title">
-          <h2>
-            <i className="fa-solid fa-receipt"></i>
-            Quản lý hóa đơn
-          </h2>
-        </div>
+    <>
+      <div id="orderToast" className="order-toast">
+        Đơn hàng mới vừa được tạo!
       </div>
-
-      <select
-        className="status-filter"
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-      >
-        <option value="all">Tất cả</option>
-        <option value="pending">Chờ xác nhận</option>
-        <option value="processing">Đang giao</option>
-        <option value="done">Hoàn thành</option>
-        <option value="cancel">Đã hủy</option>
-      </select>
-
-      <div className="filter-bar">
-        <input
-          type="text"
-          placeholder="Tìm mã / khách / SĐT"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <label>Từ</label>
-        <input
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-        />
-        <label>Đến</label>
-        <input
-          type="date"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-        />
-        <select value={sortTime} onChange={(e) => setSortTime(e.target.value)}>
-          <option value="new">Mới nhất</option>
-          <option value="old">Cũ nhất</option>
-        </select>
-        <button className="btn-secondary" onClick={resetFilter}>
-          <i className="fas fa-rotate-left"></i> Reset
-        </button>
-      </div>
-
-      <div className="table-wrapper">
-        <table className="bill-table">
-          <thead>
-            <tr>
-              <th>Mã</th>
-              <th>Khách</th>
-              <th>SĐT</th>
-              <th>Thời gian</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedBills.map((bill) => (
-              <tr key={bill.billID} onClick={() => openDetail(bill.billID)}>
-                <td>{bill.billID}</td>
-                <td>{bill.customerName}</td>
-                <td>{bill.phone}</td>
-                <td>{new Date(bill.billDate).toLocaleString()}</td>
-                <td>
-                  <span className="status">{getStatusText(bill.status)}</span>
-                </td>
-                <td onClick={(e) => e.stopPropagation()}>
-                  {renderActionButtons(bill.status, bill.billID)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={page === currentPage ? "active" : ""}
-          >
-            {page}
-          </button>
-        ))}
-      </div>
-
-      {isModalOpen && selectedBill && (
-        <div className="bill-modal" style={{ display: "flex" }}>
-          <div className="bill-modal-content">
-            <span className="close-modal" onClick={closeModal}>
-              ×
-            </span>
-            <h2>Chi tiết đơn hàng</h2>
-            <div className="detail-info">
-              <p>
-                <b>Mã đơn:</b> {currentBillId}
-              </p>
-              <p>
-                <b>Khách:</b> {selectedBill[0].customerName}
-              </p>
-              <p>
-                <b>SĐT:</b> {selectedBill[0].phone}
-              </p>
-              <p>
-                <b>Địa chỉ:</b> {selectedBill[0].address}
-              </p>
-            </div>
-            <table className="detail-table">
-              <thead>
-                <tr>
-                  <th>Món</th>
-                  <th>SL</th>
-                  <th>Giá</th>
-                  <th>Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedBill.map((p, index) => (
-                  <tr key={index}>
-                    <td>{p.coffeeName}</td>
-                    <td>{p.quantity}</td>
-                    <td>{formatPrice(p.unitPrice)}</td>
-                    <td>{formatPrice(p.subTotal)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <h3 className="detail-total">
-              Tổng tiền:{" "}
-              {formatPrice(
-                selectedBill.reduce((acc, item) => acc + item.subTotal, 0),
-              )}
-            </h3>
-            <p>
-              Trạng thái:{" "}
-              <span className="status">
-                {getStatusText(selectedBill[0].status)}
-              </span>
-            </p>
-            <div id="detailActions">
-              {renderActionButtons(selectedBill[0].status, currentBillId!)}
-            </div>
+      <div className="page-content">
+        <div className="dashboard-header">
+          <div className="header-title">
+            <h2>
+              <i className="fa-solid fa-receipt"></i>
+              Quản lý hóa đơn
+            </h2>
           </div>
         </div>
-      )}
-    </div>
+
+        <select
+          className="status-filter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">Tất cả</option>
+          <option value="pending">Chờ xác nhận</option>
+          <option value="processing">Đang giao</option>
+          <option value="done">Hoàn thành</option>
+          <option value="cancel">Đã hủy</option>
+        </select>
+
+        <div className="filter-bar">
+          <input
+            type="text"
+            placeholder="Tìm mã / khách / SĐT"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <label>Từ</label>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+          <label>Đến</label>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+          <select
+            value={sortTime}
+            onChange={(e) => setSortTime(e.target.value)}
+          >
+            <option value="new">Mới nhất</option>
+            <option value="old">Cũ nhất</option>
+          </select>
+          <button className="btn-secondary" onClick={resetFilter}>
+            <i className="fas fa-rotate-left"></i> Reset
+          </button>
+        </div>
+
+        <div className="table-wrapper">
+          <table className="bill-table">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Khách</th>
+                <th>SĐT</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedBills.map((bill) => (
+                <tr key={bill.billID} onClick={() => openDetail(bill.billID)}>
+                  <td>{bill.billID}</td>
+                  <td>{bill.customerName}</td>
+                  <td>{bill.phone}</td>
+                  <td>{new Date(bill.billDate).toLocaleString()}</td>
+                  <td>
+                    <span className="status">{getStatusText(bill.status)}</span>
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    {renderActionButtons(bill.status, bill.billID)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={page === currentPage ? "active" : ""}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+
+        {isModalOpen && selectedBill && (
+          <div className="bill-modal" style={{ display: "flex" }}>
+            <div className="bill-modal-content">
+              <span className="close-modal" onClick={closeModal}>
+                ×
+              </span>
+              <h2>Chi tiết đơn hàng</h2>
+              <div className="detail-info">
+                <p>
+                  <b>Mã đơn:</b> {currentBillId}
+                </p>
+                <p>
+                  <b>Khách:</b> {selectedBill[0].customerName}
+                </p>
+                <p>
+                  <b>SĐT:</b> {selectedBill[0].phone}
+                </p>
+                <p>
+                  <b>Địa chỉ:</b> {selectedBill[0].address}
+                </p>
+              </div>
+              <table className="detail-table">
+                <thead>
+                  <tr>
+                    <th>Món</th>
+                    <th>SL</th>
+                    <th>Giá</th>
+                    <th>Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedBill.map((p, index) => (
+                    <tr key={index}>
+                      <td>{p.coffeeName}</td>
+                      <td>{p.quantity}</td>
+                      <td>{formatPrice(p.unitPrice)}</td>
+                      <td>{formatPrice(p.subTotal)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <h3 className="detail-total">
+                Tổng tiền:{" "}
+                {formatPrice(
+                  selectedBill.reduce((acc, item) => acc + item.subTotal, 0),
+                )}
+              </h3>
+              <p>
+                Trạng thái:{" "}
+                <span className="status">
+                  {getStatusText(selectedBill[0].status)}
+                </span>
+              </p>
+              <div id="detailActions">
+                {renderActionButtons(selectedBill[0].status, currentBillId!)}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -191,6 +191,11 @@ body {
   z-index: 1000;
 }
 
+.order-toast.show {
+  display: block;
+  transform: translateY(0);
+}
+
 /* ===== MODAL ===== */
 
 .bill-modal {
