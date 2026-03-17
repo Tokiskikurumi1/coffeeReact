@@ -18,7 +18,7 @@
   width: 260px;
   background: #fff8f5; /* Beige nhạt, ấm áp như cà phê sữa */
   box-shadow: 4px 0 20px rgba(107, 78, 49, 0.12); /* Shadow nâu nhẹ */
-  z-index: 100;
+  z-index: 1001;
   transition: transform 0.3s ease;
   overflow-y: auto;
   font-family: "Poppins", sans-serif;
@@ -63,6 +63,7 @@
   list-style: none;
   padding: 1.5rem 0;
   margin: 0;
+  z-index: 1001;
 }
 
 .sidebar-menu li {
@@ -117,7 +118,7 @@
 }
 
 .open-sidebar-btn {
-  /* display: none; */
+  display: none;
   position: fixed;
   top: 10px;
   left: 10px;
@@ -130,6 +131,10 @@
   border-radius: 30%;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.open-sidebar-btn.hide {
+  display: none;
 }
 
 /* Responsive */
@@ -154,6 +159,9 @@
   #right-content {
     margin-left: 0 !important;
   }
+  .open-sidebar-btn {
+    display: block;
+  }
 }
 
 /* Khi sidebar active trên mobile, overlay hiện */
@@ -162,6 +170,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   display: none;
+  z-index: 999;
 }
 
 .overlay.active {

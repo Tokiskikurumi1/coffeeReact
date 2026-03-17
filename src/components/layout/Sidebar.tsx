@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -12,7 +12,17 @@ export default function Sidebar() {
   const closeSidebar = () => {
     setIsOpen(false);
   };
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"; // ❌ không scroll
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [isOpen]);
 
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
   return (
     <>
       <nav className={`sidebar ${isOpen ? "active" : ""}`}>
@@ -31,6 +41,7 @@ export default function Sidebar() {
           <li>
             <Link
               to="/admin/dashboard"
+              onClick={closeSidebar}
               className={
                 location.pathname === "/admin/dashboard" ? "active" : ""
               }
@@ -43,6 +54,7 @@ export default function Sidebar() {
           <li>
             <Link
               to="/admin/bills"
+              onClick={closeSidebar}
               className={location.pathname === "/admin/bills" ? "active" : ""}
             >
               <i className="fa-solid fa-receipt"></i>
@@ -53,6 +65,7 @@ export default function Sidebar() {
           <li>
             <Link
               to="/admin/customers"
+              onClick={closeSidebar}
               className={
                 location.pathname === "/admin/customers" ? "active" : ""
               }
@@ -65,6 +78,7 @@ export default function Sidebar() {
           <li>
             <Link
               to="/admin/report"
+              onClick={closeSidebar}
               className={location.pathname === "/admin/report" ? "active" : ""}
             >
               <i className="fa-solid fa-chart-line"></i>
@@ -75,6 +89,7 @@ export default function Sidebar() {
           <li>
             <Link
               to="/admin/staff"
+              onClick={closeSidebar}
               className={location.pathname === "/admin/staff" ? "active" : ""}
             >
               <i className="fa-solid fa-user-tie"></i>
@@ -95,7 +110,10 @@ export default function Sidebar() {
       {isOpen && <div className="overlay active" onClick={closeSidebar}></div>}
 
       {/* Button mở sidebar mobile */}
-      <button className="open-sidebar-btn" onClick={toggleSidebar}>
+      <button
+        className={`open-sidebar-btn ${isOpen ? "hide" : ""}`}
+        onClick={toggleSidebar}
+      >
         <i className="fa-solid fa-bars"></i>
       </button>
     </>
