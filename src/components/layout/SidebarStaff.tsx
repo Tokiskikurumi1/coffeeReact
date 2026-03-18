@@ -62,7 +62,15 @@ export default function Sidebar() {
         >
           Quản lý hóa đơn
         </Link>
-
+        <Link
+          to="/staff/profileStaff"
+          className={`sidebar-link ${
+            location.pathname === "/staff/profile" ? "active" : ""
+          }`}
+          onClick={closeSidebar}
+        >
+          Tài khoản
+        </Link>
         <button className="sidebar-link logout-btn" onClick={logout}>
           Đăng xuất
         </button>

@@ -1,0 +1,129 @@
+/* ===== PAGE ===== */
+/* .page-content {
+  margin-left: 240px;
+  padding: 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} */
+
+/* ===== HEADER ===== */
+.profile-header {
+  margin-bottom: 20px;
+}
+
+/* ===== CARD ===== */
+.profile-card {
+  width: 360px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== FORM ===== */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px 10px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* ===== BUTTON ===== */
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.profile-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+
+  background: #3498db;
+  color: #fff;
+  cursor: pointer;
+}
+
+.profile-actions button:hover {
+  opacity: 0.9;
+}
+
+/* ===== MODAL (FIX CHÍNH) ===== */
+.modal-overlay {
+  position: fixed;
+
+  top: 0;
+  left: 240px; /* tránh đè sidebar */
+  width: calc(100% - 240px);
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2000;
+}
+
+.modal-changePass {
+  width: 320px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.modal input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+
+  background: #3498db;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 992px) {
+  .page-content {
+    margin-left: 0;
+  }
+
+  .modal-overlay {
+    left: 0;
+    width: 100%;
+  }
+}
