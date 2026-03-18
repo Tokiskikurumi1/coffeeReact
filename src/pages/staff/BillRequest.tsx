@@ -350,15 +350,25 @@ export default function ManageBill() {
         </div>
 
         <div className="pagination">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={page === currentPage ? "active" : ""}
-            >
-              {page}
-            </button>
-          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            {"<"}
+          </button>
+
+          <span className="page-info">
+            {currentPage} / {totalPages || 1}
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            {">"}
+          </button>
         </div>
 
         {isModalOpen && selectedBill && (

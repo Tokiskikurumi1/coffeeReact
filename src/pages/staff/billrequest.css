@@ -344,38 +344,29 @@ table td {
 
 .pagination {
   display: flex;
-
+  align-items: center;
   justify-content: center;
-
-  gap: 8px;
-
-  margin-top: 25px;
-
-  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .pagination button {
-  padding: 8px 14px;
-
+  padding: 6px 12px;
   border: none;
-
-  background: #8b5a2b;
-
-  color: white;
-
-  border-radius: 6px;
-
+  background: #6b4e31;
+  color: #fff;
   cursor: pointer;
-}
-
-.pagination button.active {
-  background: #5d4037;
+  border-radius: 6px;
 }
 
 .pagination button:disabled {
   background: #ccc;
-
   cursor: not-allowed;
+}
+
+.page-info {
+  font-weight: 600;
+  font-size: 16px;
 }
 
 /* ===== EXPORT BUTTON ===== */
