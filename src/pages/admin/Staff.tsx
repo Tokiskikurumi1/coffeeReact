@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./staff.css";
 import "./base.css";
 
-const API = "https://localhost:7114/api/ManageStaff";
+import { StaffAPI } from "../../services/AdminAPI";
 
 export default function Staff() {
   const [staffList, setStaffList] = useState([]);
@@ -30,7 +30,7 @@ export default function Staff() {
 
   const loadStaff = async () => {
     try {
-      const res = await fetch(`${API}/load-staff`);
+      const res = await StaffAPI.load();
       const data = await res.json();
       setStaffList(data);
     } catch {
@@ -67,21 +67,12 @@ export default function Staff() {
   };
 
   // ================= ADD STAFF =================
-
   const addStaff = async () => {
     if (!validateStaff()) return;
-
-    const res = await fetch(`${API}/add-staff`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-
+    // 3. Sử dụng API
+    const res = await StaffAPI.add(form);
     const message = await res.text();
     alert(message);
-
     if (res.ok) {
       loadStaff();
       resetForm();
@@ -91,11 +82,10 @@ export default function Staff() {
   // ================= EDIT STAFF =================
 
   const openEdit = async (id: number) => {
-    const res = await fetch(`${API}/detail/${id}`);
+    // 4. Sử dụng API
+    const res = await StaffAPI.detail(id);
     const data = await res.json();
-
     const staff = data[0];
-
     setForm({
       username: staff.username,
       passwordHash: staff.passwordHash,
@@ -105,25 +95,17 @@ export default function Staff() {
       email: staff.email,
       address: staff.address,
     });
-
     setEditId(id);
     setShowModal(true);
   };
 
   const saveStaff = async () => {
     if (!validateStaff()) return;
-
-    const res = await fetch(`${API}/update-staff/${editId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-
+    if (editId === null) return;
+    // 5. Sử dụng API
+    const res = await StaffAPI.update(editId, form);
     const message = await res.text();
     alert(message);
-
     if (res.ok) {
       setShowModal(false);
       loadStaff();
@@ -131,32 +113,21 @@ export default function Staff() {
   };
 
   // ================= CHANGE STATUS =================
-
   const changeStatus = async (id: number, current: number) => {
     const newStatus = current === 1 ? 0 : 1;
-
-    const res = await fetch(`${API}/update-status/${id}?status=${newStatus}`, {
-      method: "PUT",
-    });
-
-    const message = await res.text();
-    alert(message);
-
-    if (res.ok) loadStaff();
+    // 6. Sử dụng API
+    const res = await StaffAPI.updateStatus(id, newStatus);
+    await res.text();
+    loadStaff();
   };
 
   // ================= DELETE STAFF =================
-
   const deleteStaff = async (id: number) => {
     if (!window.confirm("Bạn chắc muốn xóa?")) return;
-
-    const res = await fetch(`${API}/delete-staff/${id}`, {
-      method: "DELETE",
-    });
-
+    // 7. Sử dụng API
+    const res = await StaffAPI.delete(id);
     const message = await res.text();
     alert(message);
-
     if (res.ok) loadStaff();
   };
 

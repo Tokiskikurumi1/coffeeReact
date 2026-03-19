@@ -119,7 +119,7 @@ export const ReportAPI = {
     ),
 };
 
-// ================= STAFF =================
+// ================= MANAGE STAFF =================
 export const StaffAPI = {
   load: () => fetch(`${BASE_URL}/admin/manageStaff/load-staff`),
 

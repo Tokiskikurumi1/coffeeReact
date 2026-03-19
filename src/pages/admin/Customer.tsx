@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Customer.css";
 import "./base.css";
-
-const API_BASE = "https://localhost:7114/api/ManageCustomer";
+import { CustomerAPI } from "../../services/AdminAPI";
 
 export default function Customer() {
   const [customers, setCustomers] = useState<any[]>([]);
@@ -27,16 +26,49 @@ export default function Customer() {
 
   const loadCustomers = async () => {
     try {
-      const res = await fetch(`${API_BASE}/get-all-customer`);
-
+      const res = await CustomerAPI.getAll();
       if (!res.ok) throw new Error();
-
       const data = await res.json();
-
       setCustomers(data);
       setAllCustomers(data);
     } catch {
       console.log("Lỗi load khách hàng");
+    }
+  };
+
+  // ================= VIEW DETAIL =================
+  const viewCustomerDetail = async (userID: number) => {
+    try {
+      const res = await CustomerAPI.getDetail(userID);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!data || data.length === 0) {
+        alert("Không có dữ liệu khách hàng");
+        return;
+      }
+      setCustomerDetail(data[0]);
+      setShowModal(true);
+    } catch {
+      alert("Lỗi tải chi tiết khách hàng");
+    }
+  };
+
+  // ================= UPDATE STATUS =================
+  const updateStatus = async (userID: number, status: number) => {
+    const confirmText =
+      status === 0
+        ? "Bạn có chắc muốn KHÓA tài khoản này?"
+        : "Bạn có chắc muốn MỞ KHÓA tài khoản này?";
+    if (!confirm(confirmText)) return;
+    try {
+      // 4. Sử dụng API đã import
+      const res = await CustomerAPI.updateStatus(userID, status);
+      const message = await res.text();
+      if (!res.ok) throw new Error(message);
+      alert(message);
+      loadCustomers();
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -76,55 +108,6 @@ export default function Customer() {
     setStatusFilter("");
     setCustomers(allCustomers);
     setPage(1);
-  };
-
-  // ================= VIEW DETAIL =================
-
-  const viewCustomerDetail = async (userID: number) => {
-    try {
-      const res = await fetch(`${API_BASE}/get-customer-detail/${userID}`);
-
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
-
-      if (!data || data.length === 0) {
-        alert("Không có dữ liệu khách hàng");
-        return;
-      }
-
-      setCustomerDetail(data[0]);
-      setShowModal(true);
-    } catch {
-      alert("Lỗi tải chi tiết khách hàng");
-    }
-  };
-
-  // ================= UPDATE STATUS =================
-
-  const updateStatus = async (userID: number, status: number) => {
-    const confirmText =
-      status === 0
-        ? "Bạn có chắc muốn KHÓA tài khoản này?"
-        : "Bạn có chắc muốn MỞ KHÓA tài khoản này?";
-
-    if (!confirm(confirmText)) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/update-status/${userID}/${status}`, {
-        method: "PUT",
-      });
-
-      const message = await res.text();
-
-      if (!res.ok) throw new Error(message);
-
-      alert(message);
-
-      loadCustomers();
-    } catch (err: any) {
-      alert(err.message);
-    }
   };
 
   /* ================= PAGINATION ================= */

@@ -1,41 +1,68 @@
 import { useEffect, useState } from "react";
 import "./Bill.css";
 import "./base.css";
-
-const API_BASE = "https://localhost:7114/api/Bill";
+import { BillAPI } from "../../services/AdminAPI";
 
 export default function Bills() {
   const [bills, setBills] = useState<any[]>([]);
   const [allBills, setAllBills] = useState<any[]>([]);
-
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [totalRange, setTotalRange] = useState("");
-
   const [products, setProducts] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
-
   const [page, setPage] = useState(1);
   const pageSize = 10;
-
   const bill = products[0];
 
   /* ================= LOAD BILL ================= */
-
   useEffect(() => {
     loadBills();
   }, []);
 
   const loadBills = async () => {
     try {
-      const res = await fetch(`${API_BASE}/get-all-bill`);
+      const res = await BillAPI.getAll();
       const data = await res.json();
-
       setBills(data);
       setAllBills(data);
     } catch {
       console.log("Lỗi load hóa đơn");
+    }
+  };
+
+  /* ================= VIEW DETAIL ================= */
+  const viewBillDetail = async (id: number) => {
+    try {
+      const res = await BillAPI.getById(id);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.products) {
+        alert("Không tìm thấy hóa đơn");
+        return;
+      }
+      setProducts(data.products);
+      setLogs(data.logs || []);
+      setShowModal(true);
+    } catch {
+      console.log("Lỗi chi tiết hóa đơn");
+    }
+  };
+
+  /* ================= DELETE ================= */
+  const deleteBill = async (id: number) => {
+    if (!window.confirm("Bạn có chắc muốn xóa hóa đơn này?")) return;
+    try {
+      const res = await BillAPI.delete(id);
+      if (res.ok) {
+        alert("Xóa thành công");
+        loadBills();
+      } else {
+        alert("Xóa thất bại");
+      }
+    } catch {
+      console.log("Lỗi xóa hóa đơn");
     }
   };
 
@@ -85,50 +112,6 @@ export default function Bills() {
         return "hủy đơn";
       default:
         return action;
-    }
-  };
-
-  /* ================= VIEW DETAIL ================= */
-
-  const viewBillDetail = async (id: number) => {
-    try {
-      const res = await fetch(`${API_BASE}/get-bill-by-id/${id}`);
-
-      if (!res.ok) return;
-
-      const data = await res.json();
-
-      if (!data || !data.products) {
-        alert("Không tìm thấy hóa đơn");
-        return;
-      }
-
-      setProducts(data.products);
-      setLogs(data.logs || []);
-      setShowModal(true);
-    } catch {
-      console.log("Lỗi chi tiết hóa đơn");
-    }
-  };
-
-  /* ================= DELETE ================= */
-
-  const deleteBill = async (id: number) => {
-    if (!window.confirm("Bạn có chắc muốn xóa hóa đơn này?")) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/delete-bill/${id}`, {
-        method: "DELETE",
-      });
-
-      if (res.ok) {
-        alert("Xóa thành công");
-        loadBills();
-      } else {
-        alert("Xóa thất bại");
-      }
-    } catch {
-      console.log("Lỗi xóa hóa đơn");
     }
   };
 

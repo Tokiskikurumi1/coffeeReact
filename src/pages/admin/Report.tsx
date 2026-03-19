@@ -3,7 +3,7 @@ import Chart from "chart.js/auto";
 import "./report.css";
 import "./base.css";
 
-const API = "https://localhost:7114/api/ManageReport";
+import { ReportAPI } from "../../services/AdminAPI";
 
 interface Summary {
   revenue: number;
@@ -57,63 +57,21 @@ export default function Report() {
     generateReport();
   }, []);
 
-  const formatMoney = (num: number) => {
-    return num.toLocaleString("vi-VN") + "đ";
-  };
-
-  // ================= GENERATE =================
-
-  const generateReport = () => {
-    if (period === "ALL") {
-      loadSummaryAll();
-      loadTopProductAll();
-      loadCategoryAll();
-      loadCustomerAll();
-    } else {
-      loadSummaryType(period);
-      loadTopProductType(period);
-      loadCategoryType(period);
-      loadCustomerType(period);
-    }
-  };
-
-  // ================= FILTER =================
-
-  const filterBills = () => {
-    if (!fromDate || !toDate) {
-      alert("Vui lòng chọn ngày");
-      return;
-    }
-
-    loadSummaryDate(fromDate, toDate);
-    loadTopProductDate(fromDate, toDate);
-    loadCategoryDate(fromDate, toDate);
-    loadCustomerDate(fromDate, toDate);
-  };
-
-  const resetFilter = () => {
-    setFromDate("");
-    setToDate("");
-    setPeriod("ALL");
-    generateReport();
-  };
-
   // ================= SUMMARY =================
-
   const loadSummaryAll = async () => {
-    const res = await fetch(`${API}/get-all-summary`);
+    const res = await ReportAPI.getSummaryAll();
     const data: SummaryAPI[] = await res.json();
     renderSummary(data);
   };
 
   const loadSummaryDate = async (from: string, to: string) => {
-    const res = await fetch(`${API}/get-summary-by-date?from=${from}&to=${to}`);
+    const res = await ReportAPI.getSummaryByDate(from, to);
     const data: SummaryAPI[] = await res.json();
     renderSummary(data);
   };
 
   const loadSummaryType = async (type: string) => {
-    const res = await fetch(`${API}/get-summary-by-type?type=${type}`);
+    const res = await ReportAPI.getSummaryByType(type);
     const data: SummaryAPI[] = await res.json();
     renderSummary(data);
   };
@@ -131,7 +89,23 @@ export default function Report() {
   };
 
   // ================= PRODUCT =================
+  const loadTopProductAll = async () => {
+    const res = await ReportAPI.getTopProductAll();
+    const data: Product[] = await res.json();
+    renderProductChart(data);
+  };
 
+  const loadTopProductDate = async (from: string, to: string) => {
+    const res = await ReportAPI.getTopProductByDate(from, to);
+    const data: Product[] = await res.json();
+    renderProductChart(data);
+  };
+
+  const loadTopProductType = async (type: string) => {
+    const res = await ReportAPI.getTopProductByType(type);
+    const data: Product[] = await res.json();
+    renderProductChart(data);
+  };
   const renderProductChart = (data: Product[]) => {
     if (!productCanvas.current) return;
 
@@ -177,28 +151,7 @@ export default function Report() {
     });
   };
 
-  const loadTopProductAll = async () => {
-    const res = await fetch(`${API}/get-top-product-all`);
-    const data: Product[] = await res.json();
-    renderProductChart(data);
-  };
-
-  const loadTopProductDate = async (from: string, to: string) => {
-    const res = await fetch(
-      `${API}/get-top-product-by-date?from=${from}&to=${to}`,
-    );
-    const data: Product[] = await res.json();
-    renderProductChart(data);
-  };
-
-  const loadTopProductType = async (type: string) => {
-    const res = await fetch(`${API}/get-top-products-by-type?type=${type}`);
-    const data: Product[] = await res.json();
-    renderProductChart(data);
-  };
-
   // ================= CATEGORY =================
-
   const renderCategoryChart = (data: Category[]) => {
     if (!categoryCanvas.current) return;
 
@@ -225,52 +178,89 @@ export default function Report() {
   };
 
   const loadCategoryAll = async () => {
-    const res = await fetch(`${API}/get-top-category-all`);
+    const res = await ReportAPI.getCategoryAll();
     const data: Category[] = await res.json();
     renderCategoryChart(data);
   };
 
   const loadCategoryDate = async (from: string, to: string) => {
-    const res = await fetch(
-      `${API}/get-top-category-by-date?from=${from}&to=${to}`,
-    );
+    const res = await ReportAPI.getCategoryByDate(from, to);
     const data: Category[] = await res.json();
     renderCategoryChart(data);
   };
 
   const loadCategoryType = async (type: string) => {
-    const res = await fetch(`${API}/get-top-category-by-type?type=${type}`);
+    const res = await ReportAPI.getCategoryByType(type);
     const data: Category[] = await res.json();
     renderCategoryChart(data);
   };
 
   // ================= CUSTOMER =================
-
   const renderCustomer = (data: Customer[]) => {
     setCustomers(data || []);
   };
 
   const loadCustomerAll = async () => {
-    const res = await fetch(`${API}/get-top-customer-all`);
+    const res = await ReportAPI.getCustomerAll();
     const data: Customer[] = await res.json();
     renderCustomer(data);
   };
 
   const loadCustomerDate = async (from: string, to: string) => {
-    const res = await fetch(
-      `${API}/get-top-customer-by-date?from=${from}&to=${to}`,
-    );
+    const res = await ReportAPI.getCustomerByDate(from, to);
     const data: Customer[] = await res.json();
     renderCustomer(data);
   };
 
   const loadCustomerType = async (type: string) => {
-    const res = await fetch(`${API}/get-top-customer-by-type?type=${type}`);
+    const res = await ReportAPI.getCustomerByType(type);
     const data: Customer[] = await res.json();
     renderCustomer(data);
   };
-  // ================= UI =================
 
+  // ================= FORMAT MONEY ==================
+  const formatMoney = (num: number) => {
+    return num.toLocaleString("vi-VN") + "đ";
+  };
+
+  // ================= GENERATE =================
+
+  const generateReport = () => {
+    if (period === "ALL") {
+      loadSummaryAll();
+      loadTopProductAll();
+      loadCategoryAll();
+      loadCustomerAll();
+    } else {
+      loadSummaryType(period);
+      loadTopProductType(period);
+      loadCategoryType(period);
+      loadCustomerType(period);
+    }
+  };
+
+  // ================= FILTER =================
+
+  const filterBills = () => {
+    if (!fromDate || !toDate) {
+      alert("Vui lòng chọn ngày");
+      return;
+    }
+
+    loadSummaryDate(fromDate, toDate);
+    loadTopProductDate(fromDate, toDate);
+    loadCategoryDate(fromDate, toDate);
+    loadCustomerDate(fromDate, toDate);
+  };
+
+  const resetFilter = () => {
+    setFromDate("");
+    setToDate("");
+    setPeriod("ALL");
+    generateReport();
+  };
+
+  // ================= UI =================
   return (
     <div id="right-content">
       <main className="admin-main">
