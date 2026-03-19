@@ -146,7 +146,7 @@
 
 /* vùng chart */
 
-.chart-area {
+.chart-box {
   position: relative;
   height: 420px;
   width: 100%;
@@ -154,7 +154,7 @@
 
 /* canvas */
 
-.chart-area canvas {
+.chart-box canvas {
   width: 100% !important;
   height: 100% !important;
 }
@@ -166,7 +166,7 @@
     grid-template-columns: 1fr;
   }
 
-  .chart-area {
+  .chart-box {
     height: 360px;
   }
   .menu-toggle {

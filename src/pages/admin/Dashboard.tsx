@@ -2,16 +2,14 @@ import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import "./base.css";
 
-const API_BASE = "https://localhost:7114/api/ManageProduct";
+import { ProductAPI } from "../../services/AdminAPI";
 
 export default function Dashboard() {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [preview, setPreview] = useState<string>("");
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-
   const pageSize = 10;
 
   const [form, setForm] = useState({
@@ -23,7 +21,6 @@ export default function Dashboard() {
 
   const [editProduct, setEditProduct] = useState<any>(null);
   const [editPreview, setEditPreview] = useState("");
-  console.log("preview:", editPreview);
   const [editForm, setEditForm] = useState({
     id: "",
     name: "",
@@ -31,32 +28,43 @@ export default function Dashboard() {
     categoryID: "",
     image: null as File | null,
   });
-  // ================= LOAD DATA =================
 
+  // ================= LOAD DATA =================
   useEffect(() => {
     loadCategories();
     loadProducts();
   }, []);
 
   const loadCategories = async () => {
-    const res = await fetch(`${API_BASE}/load-category`);
-    const data = await res.json();
-    setCategories(data);
+    try {
+      const res = await ProductAPI.loadCategory();
+      const data = await res.json();
+      setCategories(data);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+      alert("Lỗi khi tải danh mục!");
+    }
   };
+
+  const loadProducts = async () => {
+    try {
+      const res = await ProductAPI.loadProduct();
+      const data = await res.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Failed to load products:", error);
+      alert("Lỗi khi tải sản phẩm!");
+    }
+  };
+
   // ================= FORMAT PRICE =================
   function formatPrice(value: string) {
     const num = value.replace(/[^\d]/g, "");
     if (!num) return "";
     return parseInt(num).toLocaleString("vi-VN") + " VND";
   }
-  const loadProducts = async () => {
-    const res = await fetch(`${API_BASE}/load-product`);
-    const data = await res.json();
-    setProducts(data);
-  };
 
   // ================= HANDLE INPUT =================
-
   const handleChange = (e: any) => {
     setForm({
       ...form,
@@ -66,30 +74,19 @@ export default function Dashboard() {
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-
     const file = e.target.files[0];
-
-    setForm((prev) => ({
-      ...prev,
-      image: file,
-    }));
-
+    setForm((prev) => ({ ...prev, image: file }));
     setPreview(URL.createObjectURL(file));
   };
+
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-
     const file = e.target.files[0];
-
-    setEditForm((prev) => ({
-      ...prev,
-      image: file,
-    }));
-
+    setEditForm((prev) => ({ ...prev, image: file }));
     setEditPreview(URL.createObjectURL(file));
   };
-  // ================= ADD PRODUCT =================
 
+  // ================= ADD PRODUCT =================
   const addProduct = async () => {
     if (!form.name || !form.price || !form.categoryID || !form.image) {
       alert("Nhập đủ thông tin!");
@@ -100,11 +97,7 @@ export default function Dashboard() {
       const upload = new FormData();
       upload.append("file", form.image);
 
-      const uploadRes = await fetch(`${API_BASE}/upload-image`, {
-        method: "POST",
-        body: upload,
-      });
-
+      const uploadRes = await ProductAPI.uploadImage(upload);
       const uploadData = await uploadRes.json();
 
       const product = {
@@ -114,25 +107,11 @@ export default function Dashboard() {
         imageURL: uploadData.imageUrl,
       };
 
-      await fetch(`${API_BASE}/add-product`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
+      await ProductAPI.addProduct(product);
 
       alert("Thêm thành công");
-
-      setForm({
-        name: "",
-        price: "",
-        categoryID: "",
-        image: null,
-      });
-
+      setForm({ name: "", price: "", categoryID: "", image: null });
       setPreview("");
-
       loadProducts();
     } catch {
       alert("Lỗi thêm sản phẩm");
@@ -140,30 +119,25 @@ export default function Dashboard() {
   };
 
   // ================= DELETE =================
-
   const deleteProduct = async (id: number) => {
     if (!confirm("Xóa sản phẩm?")) return;
-
-    await fetch(`${API_BASE}/delete-product/${id}`, {
-      method: "DELETE",
-    });
-
-    loadProducts();
+    try {
+      await ProductAPI.deleteProduct(id);
+      loadProducts();
+    } catch (error) {
+      alert("Lỗi khi xóa sản phẩm!");
+    }
   };
 
   // ================= LOCK / UNLOCK =================
   const lockProduct = async (id: number) => {
     try {
-      const res = await fetch(`${API_BASE}/update-status/${id}`, {
-        method: "PUT",
-      });
-
+      const res = await ProductAPI.updateStatus(id);
       if (!res.ok) {
         const err = await res.text();
         throw new Error(err);
       }
-
-      loadProducts(); // reload lại list
+      loadProducts();
     } catch (error) {
       console.error(error);
       alert("Lỗi khi cập nhật trạng thái!");
@@ -173,19 +147,14 @@ export default function Dashboard() {
   // ================= EDIT PRODUCT =================
   const updateProduct = async () => {
     try {
-      let imageURL = editPreview.replace("https://localhost:7114", "");
+      const BASE_IMAGE_URL = "https://localhost:7114";
+      let imageURL = editPreview.replace(BASE_IMAGE_URL, "");
 
       if (editForm.image) {
         const upload = new FormData();
         upload.append("file", editForm.image);
-
-        const uploadRes = await fetch(`${API_BASE}/upload-image`, {
-          method: "POST",
-          body: upload,
-        });
-
+        const uploadRes = await ProductAPI.uploadImage(upload);
         const uploadData = await uploadRes.json();
-
         imageURL = uploadData.imageUrl;
       }
 
@@ -196,19 +165,13 @@ export default function Dashboard() {
         imageURL: imageURL,
       };
 
-      const res = await fetch(`${API_BASE}/update-product/${editForm.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = await ProductAPI.updateProduct(parseInt(editForm.id), data);
 
       if (!res.ok) throw new Error(await res.text());
 
       alert("Cập nhật thành công!");
-
       setEditProduct(null);
       setEditPreview("");
-
       loadProducts();
     } catch {
       alert("Lỗi khi cập nhật!");

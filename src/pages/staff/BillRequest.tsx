@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
-import "./billrequest.css"; // Giả sử bạn đã tạo file CSS này
+import "./billrequest.css";
 
-const API_BASE = "https://localhost:7203/api/ManageBill";
+const API_BASE = "https://localhost:7129/staff/manageBill";
 
 // Định nghĩa kiểu dữ liệu cho một hóa đơn
 interface Bill {

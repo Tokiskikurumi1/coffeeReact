@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import "./dashboard.css";
 
-const API = "https://localhost:7203/api/DashBoard/dashboard";
+const API = "https://localhost:7129/staff/dashboard/dashboard";
 
 export default function StaffDashboard() {
   const [summary, setSummary] = useState<any>({});
