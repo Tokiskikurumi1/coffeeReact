@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import "./profilestaff.css";
 
-const API_PROFILE = "https://localhost:7203/api/Account/get-my-profile";
-const API_UPDATE = "https://localhost:7203/api/Account/update-profile";
-const API_CHANGE_PASS = "https://localhost:7203/api/Account/change-password";
+import { StaffAccountAPI } from "../../services/StaffAPI";
 
 interface Profile {
   username: string;
@@ -34,19 +32,9 @@ export default function ProfileStaff() {
 
   // ================= GET PROFILE =================
   const fetchProfile = async () => {
-    try {
-      const res = await fetch(API_PROFILE, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      });
-
-      const data: Profile = await res.json();
-
-      setProfile(data);
-    } catch (err) {
-      console.error("Lỗi lấy profile:", err);
-    }
+    const res = await StaffAccountAPI.getProfile();
+    const data = await res.json();
+    setProfile(data);
   };
 
   useEffect(() => {
@@ -55,62 +43,37 @@ export default function ProfileStaff() {
 
   // ================= UPDATE PROFILE =================
   const handleUpdate = async () => {
-    try {
-      const res = await fetch(API_UPDATE, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-        body: JSON.stringify({
-          fullName: profile.fullName,
-          gender: profile.gender,
-          phone: profile.phone,
-          email: profile.email,
-          address: profile.address,
-        }),
-      });
+    const res = await StaffAccountAPI.updateProfile({
+      fullName: profile.fullName,
+      gender: profile.gender,
+      phone: profile.phone,
+      email: profile.email,
+      address: profile.address,
+    });
 
-      const data = await res.json();
-
-      alert(data.message);
-      setEditing(false);
-      fetchProfile();
-    } catch (err) {
-      console.error("Lỗi update:", err);
-    }
+    const data = await res.json();
+    alert(data.message);
   };
 
   // ================= CHANGE PASSWORD =================
   const handleChangePassword = () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
-      return;
-    }
-
-    fetch(API_CHANGE_PASS, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-      body: JSON.stringify({
-        oldPassword: passwordData.oldPassword,
-        newPassword: passwordData.newPassword,
-      }),
+    StaffAccountAPI.changePassword({
+      oldPassword: passwordData.oldPassword,
+      newPassword: passwordData.newPassword,
     })
       .then((res) => res.json())
-      .then((data) => {
-        alert(data.message);
-        setShowModal(false);
-        setPasswordData({
-          oldPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-      });
+      .then((data) => alert(data.message));
+    resetForm();
   };
 
+  // ================= RESET PASSWORD =================
+  const resetForm = () => {
+    setPasswordData({
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
   return (
     <div
       className="page-content"

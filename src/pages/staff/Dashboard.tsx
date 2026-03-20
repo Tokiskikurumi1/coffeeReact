@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 import "./dashboard.css";
-
-const API = "https://localhost:7129/staff/dashboard/dashboard";
+import { DashboardAPI } from "../../services/StaffAPI";
 
 export default function StaffDashboard() {
   const [summary, setSummary] = useState<any>({});
@@ -22,17 +21,7 @@ export default function StaffDashboard() {
   );
   // ================= CALL API =================
   const fetchDashboard = () => {
-    let url = `${API}?type=${type}`;
-
-    if (type === "RANGE") {
-      url += `&fromDate=${fromDate}&toDate=${toDate}`;
-    }
-
-    fetch(url, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-    })
+    DashboardAPI.getDashboard(type, fromDate, toDate)
       .then((res) => res.json())
       .then((data) => {
         setSummary(data.summary);

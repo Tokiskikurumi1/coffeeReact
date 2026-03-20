@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
 import "./billrequest.css";
 
-const API_BASE = "https://localhost:7129/staff/manageBill";
+import { StaffBillAPI } from "../../services/StaffAPI";
 
-// Định nghĩa kiểu dữ liệu cho một hóa đơn
 interface Bill {
   billID: number;
   customerName: string;
@@ -13,7 +12,6 @@ interface Bill {
   status: number;
 }
 
-// Định nghĩa kiểu dữ liệu cho chi tiết sản phẩm trong hóa đơn
 interface BillDetailProduct {
   coffeeName: string;
   quantity: number;
@@ -68,53 +66,39 @@ export default function ManageBill() {
 
   // --- API Calls ---
   const loadBills = async () => {
-    try {
-      const token = getToken();
-      const res = await fetch(`${API_BASE}/get-all-bill`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data: Bill[] = await res.json();
-
-      // ÉP React nhận state mới
-      setBills([...data]);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await StaffBillAPI.getAll();
+    const data = await res.json();
+    setBills([...data]);
   };
 
   const updateStatus = async (billId: number, status: number) => {
-    try {
-      const token = getToken();
-      const res = await fetch(
-        `${API_BASE}/update-status?billId=${billId}&status=${status}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      const msg = await res.text();
-      alert(msg);
-      closeModal();
-      loadBills(); // Tải lại danh sách hóa đơn
-    } catch (err) {
-      console.error(err);
+    const res = await StaffBillAPI.updateStatus(billId, status);
+    const msg = await res.text();
+    alert(msg);
+    if (selectedBill) {
+      const updated = selectedBill.map((item) => ({
+        ...item,
+        status: status,
+      }));
+      setSelectedBill(updated);
     }
+    loadBills();
   };
 
   // --- Effects ---
   useEffect(() => {
-    loadBills(); // Tải dữ liệu lần đầu
+    loadBills();
 
     // Thiết lập một interval để kiểm tra hóa đơn mới mỗi 5 giây
     const interval = setInterval(() => {
       loadBills();
-    }, 5000); // 5000ms = 5 giây
+    }, 5000);
 
     // Dọn dẹp interval khi component bị unmount
     return () => clearInterval(interval);
   }, []);
 
-  // *** LOGIC MỚI: Hiển thị toast khi có hóa đơn mới ***
+  //  Hiển thị toast khi có hóa đơn mới
   useEffect(() => {
     if (bills.length === 0) return;
 
@@ -191,10 +175,7 @@ export default function ManageBill() {
   const openDetail = async (id: number) => {
     try {
       setCurrentBillId(id);
-      const token = getToken();
-      const res = await fetch(`${API_BASE}/get-bill-detail/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await StaffBillAPI.getDetail(id);
       const data: BillDetailProduct[] = await res.json();
       if (data && data.length > 0) {
         setSelectedBill(data);
