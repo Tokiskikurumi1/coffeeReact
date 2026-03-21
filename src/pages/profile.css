@@ -446,4 +446,7 @@ body.no-scroll {
   .info-grid {
     gap: 12px;
   }
+  .main-content {
+    padding: 15px;
+  }
 }

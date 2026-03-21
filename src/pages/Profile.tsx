@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./profile.css";
-
+import SidebarCustomer from "../components/layout/SidebarCustomer";
 import { CustomerProfileAPI } from "../services/CustomerAPI";
 const BASE_URL = "https://localhost:7027";
 const PRODUCT_URL = "https://localhost:7114";
@@ -15,6 +15,8 @@ export default function Profile() {
   const [showOrders, setShowOrders] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [status, setStatus] = useState("All");
+
+  const finalAvatar = avatarPreview || avatarUrl || "/images/user.jpg";
   const orderStatusList = [
     { value: "All", label: "Tất cả" },
     { value: "Pending", label: "Chờ xác nhận" },
@@ -55,7 +57,9 @@ export default function Profile() {
     setProfile(data);
 
     if (data.avatar) {
-      setAvatarUrl(data.avatar);
+      setAvatarUrl(BASE_URL + data.avatar);
+    } else {
+      setAvatarUrl("/images/user.jpg");
     }
   };
 
@@ -190,55 +194,16 @@ export default function Profile() {
       <div>
         <div className="container-profile">
           {/* SIDEBAR */}
-          <section className={`sidebar-profile ${sidebarOpen ? "active" : ""}`}>
-            <div className="sidebar-header-profile">
-              <div className="avatar">
-                <img
-                  className="img-avt"
-                  src={
-                    avatarUrl
-                      ? BASE_URL + avatarUrl
-                      : "https://i.pravatar.cc/200"
-                  }
-                />
-              </div>
-
-              <h2 className="sidebar-name">{profile.fullName}</h2>
-            </div>
-
-            <ul className="sidebar-menu">
-              <li>
-                <a
-                  className={!showOrders ? "active" : ""}
-                  onClick={() => {
-                    setShowOrders(false);
-                    setSidebarOpen(false);
-                  }}
-                >
-                  <i className="fas fa-user-circle"></i> Thông tin cá nhân
-                </a>
-              </li>
-
-              <li>
-                <a
-                  className={showOrders ? "active" : ""}
-                  onClick={() => {
-                    setShowOrders(true);
-                    renderOrders("All");
-                    setSidebarOpen(false);
-                  }}
-                >
-                  <i className="fas fa-receipt"></i> Hóa đơn của tôi
-                </a>
-              </li>
-
-              <li>
-                <a onClick={logout}>
-                  <i className="fas fa-sign-out-alt"></i> Đăng xuất
-                </a>
-              </li>
-            </ul>
-          </section>
+          <SidebarCustomer
+            avatarUrl={avatarUrl}
+            fullName={profile.fullName}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            showOrders={showOrders}
+            setShowOrders={setShowOrders}
+            renderOrders={renderOrders}
+            logout={logout}
+          />
           <div
             className={`overlay ${sidebarOpen ? "active" : ""}`}
             onClick={() => setSidebarOpen(false)}
@@ -334,13 +299,7 @@ export default function Profile() {
                   <div className="profile-right">
                     <img
                       id="previewAvatar"
-                      src={
-                        avatarPreview
-                          ? avatarPreview
-                          : avatarUrl
-                            ? BASE_URL + avatarUrl
-                            : "https://i.pravatar.cc/200"
-                      }
+                      src={avatarPreview || avatarUrl || "/images/user.jpg"}
                     />
 
                     <input

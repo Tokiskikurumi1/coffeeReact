@@ -19,9 +19,8 @@ export default function ProductSection() {
     try {
       const res = await TotalProduct.getTotalProduct();
 
-      // 👉 mapping từ backend → frontend
       const mapped: Product[] = res.map((item: any) => ({
-        image: `${BASE_IMAGE}${item.imageURL}`, // thêm base URL nếu cần
+        image: `${BASE_IMAGE}${item.imageURL}`,
         name: item.coffeeName,
         sold: item.totalSold,
       }));

@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import "./base.css";
-
+import AddProductForm from "./DashboardSection/AddProductForm";
 import { ProductAPI } from "../../services/AdminAPI";
 
 export default function Dashboard() {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
-  const [preview, setPreview] = useState<string>("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
-
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    categoryID: "",
-    image: null as File | null,
-  });
 
   const [editProduct, setEditProduct] = useState<any>(null);
   const [editPreview, setEditPreview] = useState("");
@@ -64,58 +56,11 @@ export default function Dashboard() {
     return parseInt(num).toLocaleString("vi-VN") + " VND";
   }
 
-  // ================= HANDLE INPUT =================
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const file = e.target.files[0];
-    setForm((prev) => ({ ...prev, image: file }));
-    setPreview(URL.createObjectURL(file));
-  };
-
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const file = e.target.files[0];
     setEditForm((prev) => ({ ...prev, image: file }));
     setEditPreview(URL.createObjectURL(file));
-  };
-
-  // ================= ADD PRODUCT =================
-  const addProduct = async () => {
-    if (!form.name || !form.price || !form.categoryID || !form.image) {
-      alert("Nhập đủ thông tin!");
-      return;
-    }
-
-    try {
-      const upload = new FormData();
-      upload.append("file", form.image);
-
-      const uploadRes = await ProductAPI.uploadImage(upload);
-      const uploadData = await uploadRes.json();
-
-      const product = {
-        coffeeName: form.name,
-        price: parseInt(form.price),
-        categoryID: parseInt(form.categoryID),
-        imageURL: uploadData.imageUrl,
-      };
-
-      await ProductAPI.addProduct(product);
-
-      alert("Thêm thành công");
-      setForm({ name: "", price: "", categoryID: "", image: null });
-      setPreview("");
-      loadProducts();
-    } catch {
-      alert("Lỗi thêm sản phẩm");
-    }
   };
 
   // ================= DELETE =================
@@ -198,82 +143,7 @@ export default function Dashboard() {
     <div id="right-content">
       <main className="admin-main">
         {/* FORM */}
-        <section className="add-product-card">
-          <h2>
-            <i className="fas fa-coffee"></i> Thêm món mới
-          </h2>
-
-          <div className="product-form">
-            <div className="form-group">
-              <label>Tên món</label>
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Cappuccino"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Giá</label>
-              <input
-                name="price"
-                value={formatPrice(form.price)}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/[^\d]/g, "");
-                  setForm({ ...form, price: raw });
-                }}
-                placeholder="50.000 VND"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Ảnh</label>
-
-              <input
-                type="file"
-                id="productImage"
-                accept="image/*"
-                hidden
-                onChange={handleImage}
-              />
-
-              <button
-                type="button"
-                className="btn-upload"
-                onClick={() => document.getElementById("productImage")?.click()}
-              >
-                <i className="fas fa-image"></i> Chọn ảnh
-              </button>
-
-              {preview && (
-                <img src={preview} style={{ width: 120, marginTop: 10 }} />
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Loại</label>
-
-              <select
-                name="categoryID"
-                value={form.categoryID}
-                onChange={handleChange}
-              >
-                <option value="">Chọn loại</option>
-
-                {categories.map((c) => (
-                  <option key={c.categoryID} value={c.categoryID}>
-                    {c.categoryName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button className="btn-primary" onClick={addProduct}>
-              Thêm món
-            </button>
-          </div>
-        </section>
+        <AddProductForm categories={categories} reload={loadProducts} />
 
         {/* PRODUCT LIST */}
 
