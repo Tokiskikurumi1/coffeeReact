@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export default function Header() {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +22,9 @@ export default function Header() {
     navigate("/"); // về trang chủ
     window.location.reload(); // giống JS cũ
   };
-
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
   return (
     <div id="header">
       <div className="login-table">
@@ -43,19 +46,31 @@ export default function Header() {
         <Link to="/" className="logo">
           <img src="/images/logo.png" alt="logo" />
         </Link>
-
-        <ul className="ul-bar">
+        <i
+          className="fa-solid fa-bars"
+          id="menu-icon-home"
+          onClick={toggleMenu}
+        ></i>
+        <ul className={`ul-bar ${menuOpen ? "active" : ""}`}>
           <li>
-            <Link to="/">Trang chủ</Link>
+            <Link to="/" onClick={() => setMenuOpen(false)}>
+              Trang chủ
+            </Link>
           </li>
           <li>
-            <Link to="/intro">Giới thiệu</Link>
+            <Link to="/intro" onClick={() => setMenuOpen(false)}>
+              Giới thiệu
+            </Link>
           </li>
           <li>
-            <Link to="/products">Sản phẩm</Link>
+            <Link to="/products" onClick={() => setMenuOpen(false)}>
+              Sản phẩm
+            </Link>
           </li>
           <li>
-            <Link to="/contact">Liên hệ</Link>
+            <Link to="/contact" onClick={() => setMenuOpen(false)}>
+              Liên hệ
+            </Link>
           </li>
         </ul>
 

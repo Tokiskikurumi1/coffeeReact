@@ -102,7 +102,7 @@ body {
   color: #bc9667;
 }
 
-#menu-icon {
+#menu-icon-home {
   font-size: 22px;
   cursor: pointer;
   color: white;
@@ -822,7 +822,6 @@ textarea:focus {
   text-align: center;
 }
 
-
 /* Media Queries */
 @media (max-width: 1058px) {
   /* header {
@@ -861,7 +860,7 @@ textarea:focus {
   /* header {
     padding: 12px 4%;
   } */
-  #menu-icon {
+  #menu-icon-home {
     display: initial;
   }
   .ul-bar {
@@ -898,7 +897,7 @@ textarea:focus {
   .left-infor-cart th:nth-child(4),
   .left-infor-cart td:nth-child(3),
   .left-infor-cart td:nth-child(4) {
-    display: none; /* Ẩn cột Số lượng và Thành tiền */
+    display: none;
   }
 
   .left-infor-cart th:nth-child(1) {
