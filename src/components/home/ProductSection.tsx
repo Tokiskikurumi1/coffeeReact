@@ -1,19 +1,44 @@
 import ProductCard from "../common/ProductCard";
+import { TotalProduct } from "../../services/CustomerAPI";
+import { useEffect, useState } from "react";
+const BASE_IMAGE = "https://localhost:7114";
+type Product = {
+  image: string;
+  name: string;
+  sold: number;
+};
 
 export default function ProductSection() {
-  const products = [
-    { id: 1, name: "Cà phê đá", sold: 10000, image: "/images/capheda.png" },
-    { id: 2, name: "Cà phê muối", sold: 9000, image: "/images/caphemuoi.png" },
-    { id: 3, name: "Cà phê đá", sold: 10000, image: "/images/capheda.png" },
-    { id: 4, name: "Cà phê muối", sold: 9000, image: "/images/caphemuoi.png" },
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const res = await TotalProduct.getTotalProduct();
+
+      // 👉 mapping từ backend → frontend
+      const mapped: Product[] = res.map((item: any) => ({
+        image: `${BASE_IMAGE}${item.imageURL}`, // thêm base URL nếu cần
+        name: item.coffeeName,
+        sold: item.totalSold,
+      }));
+
+      setProducts(mapped);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="content products">
-      <h2 style={{ justifyContent: "center" }}>SẢN PHẨM CỦA CHÚNG TÔI</h2>
+      <h2 style={{ textAlign: "center" }}>SẢN PHẨM CỦA CHÚNG TÔI</h2>
+
       <div className="product-content">
-        {products.map((item) => (
-          <ProductCard key={item.id} data={item} />
+        {products.map((item, index) => (
+          <ProductCard key={index} data={item} />
         ))}
       </div>
     </div>

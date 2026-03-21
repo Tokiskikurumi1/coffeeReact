@@ -5,15 +5,20 @@ const getAuthHeader = () => ({
   Authorization: "Bearer " + localStorage.getItem("accessToken"),
 });
 
+export const TotalProduct = {
+  getTotalProduct: async () => {
+    const res = await fetch(`${BASE_URL}/customer/TotalProduct/top-selling`);
+    return res.json();
+  },
+};
+
 // ===================================================================
 // ======================= PRODUCT (PUBLIC) ===========================
 // ===================================================================
 export const CustomerProductAPI = {
-  loadCategory: () =>
-    fetch(`${BASE_URL}/customer/product/load-category`),
+  loadCategory: () => fetch(`${BASE_URL}/customer/product/load-category`),
 
-  loadProduct: () =>
-    fetch(`${BASE_URL}/customer/product/load-product`),
+  loadProduct: () => fetch(`${BASE_URL}/customer/product/load-product`),
 
   loadByCategory: (id: number) =>
     fetch(`${BASE_URL}/customer/product/load-product-by-category/${id}`),
