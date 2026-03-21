@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./profile.css";
 
-const API = "https://localhost:7027/api/Customer";
+import { CustomerProfileAPI } from "../services/CustomerAPI";
 const BASE_URL = "https://localhost:7027";
 const PRODUCT_URL = "https://localhost:7114";
 
@@ -48,11 +48,7 @@ export default function Profile() {
   }, []);
 
   const loadProfile = async () => {
-    const res = await fetch(`${API}/get-profile`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const res = await CustomerProfileAPI.getProfile();
 
     const data = await res.json();
 
@@ -95,16 +91,14 @@ export default function Profile() {
       const formData = new FormData();
       formData.append("file", avatarFile);
 
-      const uploadRes = await fetch(`${API}/customer-upload-image`, {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-        body: formData,
-      });
+      const uploadRes = await CustomerProfileAPI.uploadAvatar(formData);
+
+      if (!uploadRes.ok) {
+        alert("Upload ảnh thất bại");
+        return;
+      }
 
       const uploadData = await uploadRes.json();
-
       newAvatar = uploadData.imageUrl;
     }
 
@@ -118,14 +112,7 @@ export default function Profile() {
       avatar: newAvatar,
     };
 
-    const res = await fetch(`${API}/update-profile`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-      body: JSON.stringify(body),
-    });
+    const res = await CustomerProfileAPI.updateProfile(body);
 
     const message = await res.text();
 
@@ -138,11 +125,7 @@ export default function Profile() {
 
   // ================= LOAD ORDERS =================
   const renderOrders = async (orderStatus = "All") => {
-    const res = await fetch(`${API}/get-orders?status=${orderStatus}`, {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const res = await CustomerProfileAPI.getOrders(orderStatus);
 
     const data = await res.json();
 
@@ -158,12 +141,7 @@ export default function Profile() {
   const cancelOrder = async (billId: number) => {
     if (!confirm("Bạn có chắc muốn hủy đơn này?")) return;
 
-    const res = await fetch(`${API}/cancel-order/${billId}`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+    const res = await CustomerProfileAPI.cancelOrder(billId);
 
     const message = await res.text();
 

@@ -84,10 +84,10 @@ export default function ProfileStaff() {
       }}
     >
       <div className="profile-header">
-        <h2>Thông tin cá nhân</h2>
+        <h2 style={{ margin: "0" }}>Thông tin cá nhân</h2>
       </div>
 
-      <div className="profile-card">
+      <div className="profile-card-staff">
         <div className="form-group">
           <label>Username</label>
           <input value={profile.username || ""} disabled />

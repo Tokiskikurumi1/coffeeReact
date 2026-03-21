@@ -281,21 +281,29 @@ export default function Dashboard() {
           <h2>
             <i className="fas fa-list-ul"></i> Danh sách menu
           </h2>
+          <div className="filter-bar" style={{ alignItems: "flex-start" }}>
+            {/* SEARCH */}
+            <div className="filter-group">
+              <label>Tìm kiếm</label>
+              <input
+                placeholder="Tìm sản phẩm..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
 
-          {/* SEARCH */}
-          <input
-            placeholder="Tìm sản phẩm..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            style={{
-              marginBottom: 20,
-              padding: 8,
-              width: 300,
-            }}
-          />
+            <div className="filter-group">
+              <label>Loại sản phẩm</label>
+              <select>
+                <option value="">Tất cả trạng thái</option>
+                <option value="1">Hoạt động</option>
+                <option value="0">Đã khóa</option>
+              </select>
+            </div>
+          </div>
 
           <div className="table-container">
             <table className="product-table">

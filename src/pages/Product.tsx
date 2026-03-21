@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const API_BASE = "https://localhost:7027/api";
+import { CustomerProductAPI, CustomerCartAPI } from "../services/CustomerAPI";
 const BACKEND_URL = "https://localhost:7114";
 
 interface Category {
@@ -32,13 +32,13 @@ export default function Product() {
   }, []);
 
   const loadCategory = async () => {
-    const res = await fetch(`${API_BASE}/LoadCoffee/load-category`);
+    const res = await CustomerProductAPI.loadCategory();
     const data = await res.json();
     setCategories(data);
   };
 
   const loadProducts = async () => {
-    const res = await fetch(`${API_BASE}/LoadCoffee/load-product`);
+    const res = await CustomerProductAPI.loadProduct();
     const data = await res.json();
     setProducts(data);
   };
@@ -72,17 +72,7 @@ export default function Product() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/Cart/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        coffeeId: coffeeID,
-        quantity: 1,
-      }),
-    });
+    const res = await CustomerCartAPI.addToCart(coffeeID, 1);
 
     if (!res.ok) {
       alert(await res.text());

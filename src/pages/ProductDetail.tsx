@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-const API_BASE = "https://localhost:7027/api";
+import { CustomerProductAPI, CustomerCartAPI } from "../services/CustomerAPI";
 const BACKEND_URL = "https://localhost:7114";
 
 interface ProductDetailType {
@@ -32,7 +32,7 @@ export default function ProductDetail() {
 
   const loadDetail = async () => {
     try {
-      const res = await fetch(`${API_BASE}/LoadCoffee/load-coffee-by-ID/${id}`);
+      const res = await CustomerProductAPI.getDetailProduct(Number(id));
 
       if (!res.ok) {
         alert("Sản phẩm không tồn tại hoặc đã ngừng phục vụ");
@@ -62,17 +62,7 @@ export default function ProductDetail() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/Cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          coffeeID: Number(id),
-          quantity: quantity,
-        }),
-      });
+      const res = await CustomerCartAPI.addToCart(Number(id), quantity);
 
       if (res.status === 401) {
         alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");

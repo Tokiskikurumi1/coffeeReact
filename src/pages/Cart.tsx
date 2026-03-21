@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "https://localhost:7027/api";
+import { CustomerProductAPI, CustomerCartAPI } from "../services/CustomerAPI";
 const BACKEND_URL = "https://localhost:7114";
 
 interface CartItem {
@@ -26,12 +26,7 @@ export default function Cart() {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/Cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await CustomerCartAPI.getCart();
 
       if (response.status === 401) {
         alert("Phiên đăng nhập hết hạn!");
@@ -63,17 +58,7 @@ export default function Cart() {
     const token = localStorage.getItem("accessToken");
 
     try {
-      const res = await fetch(`${API_BASE}/Cart/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          billDetailID,
-          quantity: newQuantity,
-        }),
-      });
+      const res = await CustomerCartAPI.updateCart(billDetailID, newQuantity);
 
       const message = await res.text();
 
@@ -98,12 +83,7 @@ export default function Cart() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/Cart/checkout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await CustomerCartAPI.checkout();
 
       const message = await res.text();
 
