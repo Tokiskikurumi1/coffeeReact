@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import "./base.css";
 import AddProductForm from "./DashboardSection/AddProductForm";
+import EditProductModal from "./DashboardSection/EditProductModal";
+
 import { ProductAPI } from "../../services/AdminAPI";
 
 export default function Dashboard() {
@@ -49,20 +51,6 @@ export default function Dashboard() {
     }
   };
 
-  // ================= FORMAT PRICE =================
-  function formatPrice(value: string) {
-    const num = value.replace(/[^\d]/g, "");
-    if (!num) return "";
-    return parseInt(num).toLocaleString("vi-VN") + " VND";
-  }
-
-  const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const file = e.target.files[0];
-    setEditForm((prev) => ({ ...prev, image: file }));
-    setEditPreview(URL.createObjectURL(file));
-  };
-
   // ================= DELETE =================
   const deleteProduct = async (id: number) => {
     if (!confirm("Xóa sản phẩm?")) return;
@@ -89,39 +77,6 @@ export default function Dashboard() {
     }
   };
 
-  // ================= EDIT PRODUCT =================
-  const updateProduct = async () => {
-    try {
-      const BASE_IMAGE_URL = "https://localhost:7114";
-      let imageURL = editPreview.replace(BASE_IMAGE_URL, "");
-
-      if (editForm.image) {
-        const upload = new FormData();
-        upload.append("file", editForm.image);
-        const uploadRes = await ProductAPI.uploadImage(upload);
-        const uploadData = await uploadRes.json();
-        imageURL = uploadData.imageUrl;
-      }
-
-      const data = {
-        coffeeName: editForm.name,
-        price: parseInt(editForm.price),
-        categoryID: parseInt(editForm.categoryID),
-        imageURL: imageURL,
-      };
-
-      const res = await ProductAPI.updateProduct(parseInt(editForm.id), data);
-
-      if (!res.ok) throw new Error(await res.text());
-
-      alert("Cập nhật thành công!");
-      setEditProduct(null);
-      setEditPreview("");
-      loadProducts();
-    } catch {
-      alert("Lỗi khi cập nhật!");
-    }
-  };
   // ================= SEARCH =================
 
   const filteredProducts = products.filter((p) =>
@@ -297,135 +252,19 @@ export default function Dashboard() {
           </div>
         </section>
       </main>
-      {editProduct && (
-        <div
-          className="modal"
-          id="editModal"
-          style={{ display: editProduct ? "flex" : "none" }}
-        >
-          <div className="modal-content">
-            <span
-              className="close-btn"
-              onClick={() => {
-                setEditProduct(null);
-                setEditPreview("");
-              }}
-            >
-              &times;
-            </span>
-
-            <h2>
-              <i className="fas fa-edit"></i> Chỉnh sửa món
-            </h2>
-
-            <form
-              id="editProductForm"
-              className="product-form"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              {/* ID ẨN */}
-              <input type="hidden" id="editId" value={editForm.id} />
-
-              <div className="form-group">
-                <label>Tên món</label>
-
-                <input
-                  id="editName"
-                  value={editForm.name}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, name: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Giá bán</label>
-
-                <input
-                  id="editPrice"
-                  value={formatPrice(editForm.price)}
-                  onChange={(e) => {
-                    const raw = e.target.value.replace(/[^\d]/g, "");
-                    setEditForm({ ...editForm, price: raw });
-                  }}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Loại</label>
-
-                <select
-                  id="editType"
-                  value={editForm.categoryID}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, categoryID: e.target.value })
-                  }
-                >
-                  <option value="">Chọn loại</option>
-
-                  {categories.map((c) => (
-                    <option key={c.categoryID} value={c.categoryID}>
-                      {c.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Ảnh mới (nếu thay đổi)</label>
-
-                <div className="image-upload">
-                  <input
-                    type="file"
-                    id="editImage"
-                    accept="image/*"
-                    hidden
-                    onChange={handleEditImage}
-                  />
-
-                  <button
-                    type="button"
-                    className="btn-upload"
-                    onClick={() =>
-                      document.getElementById("editImage")?.click()
-                    }
-                  >
-                    <i className="fas fa-image"></i> Chọn ảnh mới
-                  </button>
-
-                  <img
-                    id="editPreviewImage"
-                    src={editPreview || "https://via.placeholder.com/120"}
-                    style={{ width: 120, marginTop: 10 }}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setEditProduct(null);
-                    setEditPreview("");
-                  }}
-                >
-                  Hủy
-                </button>
-
-                <button
-                  type="button"
-                  id="saveEditBtn"
-                  className="btn-primary"
-                  onClick={updateProduct}
-                >
-                  Lưu thay đổi
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <EditProductModal
+        editProduct={editProduct}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        editPreview={editPreview}
+        setEditPreview={setEditPreview}
+        categories={categories}
+        onClose={() => {
+          setEditProduct(null);
+          setEditPreview("");
+        }}
+        reload={loadProducts}
+      />
     </div>
   );
 }
