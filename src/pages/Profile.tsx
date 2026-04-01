@@ -15,6 +15,8 @@ export default function Profile() {
   const [showOrders, setShowOrders] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [status, setStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const finalAvatar = avatarPreview || avatarUrl || "/images/user.jpg";
   const orderStatusList = [
@@ -138,6 +140,7 @@ export default function Profile() {
 
   const filterOrders = (st: string) => {
     setStatus(st);
+    setCurrentPage(1); // Reset to first page when filtering
     renderOrders(st);
   };
 
@@ -183,6 +186,12 @@ export default function Profile() {
 
     return acc;
   }, {});
+
+  const billIds = Object.keys(groupedBills);
+  const totalPages = Math.ceil(billIds.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentBillIds = billIds.slice(startIndex, endIndex);
   return (
     <div className="container">
       <button
@@ -349,7 +358,7 @@ export default function Profile() {
                     </p>
                   )}
 
-                  {Object.keys(groupedBills).map((billID: any) => {
+                  {currentBillIds.map((billID: any) => {
                     const o = groupedBills[billID];
 
                     return (
@@ -413,6 +422,30 @@ export default function Profile() {
                     );
                   })}
                 </div>
+
+                {orders.length > 0 && (
+                  <div className="pagination">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      {"<"}
+                    </button>
+                    <span>
+                      Trang {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      {">"}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </main>
