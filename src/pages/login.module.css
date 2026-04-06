@@ -10,11 +10,13 @@
   position: relative;
 }
 
-.iconLog img {
+/* .iconLog img, */
+.iconLog i {
   position: absolute;
   top: 20px;
   left: 20px;
   width: 55px;
+  font-size: 40px;
 }
 
 .wrapper {
@@ -86,8 +88,8 @@
   color: #8d6e63;
 }
 
-.inputField:focus ~ .label,
-.inputField:valid ~ .label {
+.inputField:focus~.label,
+.inputField:valid~.label {
   top: 0;
   font-size: 13px;
   background: #efebe9;

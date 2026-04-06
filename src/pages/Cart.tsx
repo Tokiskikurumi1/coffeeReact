@@ -113,24 +113,28 @@ export default function Cart() {
           <table className="table-infor-cart">
             <thead>
               <tr>
-                <th>Hình ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Đơn giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
+                <th className="info-cart-th">Hình ảnh</th>
+                <th className="info-cart-th">Tên sản phẩm</th>
+                <th className="info-cart-th">Đơn giá</th>
+                <th className="info-cart-th">Số lượng</th>
+                <th className="info-cart-th">Thành tiền</th>
               </tr>
             </thead>
             <tbody>
               {cartData.length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ textAlign: "center" }}>
+                  <td
+                    className="info-cart-td"
+                    colSpan={5}
+                    style={{ textAlign: "center" }}
+                  >
                     Giỏ hàng trống
                   </td>
                 </tr>
               ) : (
                 cartData.map((item) => (
                   <tr key={item.billDetailID}>
-                    <td>
+                    <td className="info-cart-td">
                       <img
                         src={
                           item.imageURL
@@ -141,9 +145,11 @@ export default function Cart() {
                         alt=""
                       />
                     </td>
-                    <td>{item.coffeeName}</td>
-                    <td>{formatMoney(item.unitPrice)}</td>
-                    <td>
+                    <td className="info-cart-td">{item.coffeeName}</td>
+                    <td className="info-cart-td">
+                      {formatMoney(item.unitPrice)}
+                    </td>
+                    <td className="info-cart-td">
                       <button
                         className="btnUpdateQuantity"
                         onClick={() =>

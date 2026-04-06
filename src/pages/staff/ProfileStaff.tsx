@@ -147,8 +147,10 @@ export default function ProfileStaff() {
             <button onClick={() => setEditing(true)}>Chỉnh sửa</button>
           ) : (
             <>
-              <button onClick={handleUpdate}>Lưu</button>
-              <button onClick={() => setEditing(false)}>Hủy</button>
+              <div style={{ gap: "10px", display: "flex" }}>
+                <button onClick={handleUpdate}>Lưu</button>
+                <button onClick={() => setEditing(false)}>Hủy</button>
+              </div>
             </>
           )}
 

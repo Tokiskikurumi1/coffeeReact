@@ -112,7 +112,8 @@ export default function Login() {
   return (
     <div className={styles.loginPage}>
       <a href="/" className={styles.iconLog}>
-        <img src="/HomepageImage/home.png" alt="home" />
+        <i className="fa-solid fa-arrow-left"></i>
+        {/* <img src="/HomepageImage/home.png" alt="home" /> */}
       </a>
 
       <div
