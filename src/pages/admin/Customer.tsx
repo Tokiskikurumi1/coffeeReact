@@ -61,7 +61,6 @@ export default function Customer() {
         : "Bạn có chắc muốn MỞ KHÓA tài khoản này?";
     if (!confirm(confirmText)) return;
     try {
-      // 4. Sử dụng API đã import
       const res = await CustomerAPI.updateStatus(userID, status);
       const message = await res.text();
       if (!res.ok) throw new Error(message);
