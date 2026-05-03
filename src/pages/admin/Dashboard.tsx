@@ -10,6 +10,8 @@ export default function Dashboard() {
   const [categories, setCategories] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -79,9 +81,12 @@ export default function Dashboard() {
 
   // ================= SEARCH =================
 
-  const filteredProducts = products.filter((p) =>
-    p.coffeeName.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchSearch = p.coffeeName.toLowerCase().includes(search.toLowerCase());
+    const matchCategory = selectedCategory === "" || p.categoryID.toString() === selectedCategory;
+    const matchStatus = selectedStatus === "" || p.status.toString() === selectedStatus;
+    return matchSearch && matchCategory && matchStatus;
+  });
 
   // ================= PAGINATION =================
 
@@ -122,7 +127,31 @@ export default function Dashboard() {
 
             <div className="filter-group">
               <label>Loại sản phẩm</label>
-              <select>
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="">Tất cả danh mục</option>
+                {categories.map((c) => (
+                  <option key={c.categoryID} value={c.categoryID}>
+                    {c.categoryName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Trạng thái</label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => {
+                  setSelectedStatus(e.target.value);
+                  setPage(1);
+                }}
+              >
                 <option value="">Tất cả trạng thái</option>
                 <option value="1">Hoạt động</option>
                 <option value="0">Đã khóa</option>
