@@ -50,7 +50,7 @@ export default function Sidebar() {
           }`}
           onClick={closeSidebar}
         >
-          Dashboard
+          Tổng quan
         </Link>
 
         <Link
