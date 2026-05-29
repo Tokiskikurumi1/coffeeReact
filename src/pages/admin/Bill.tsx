@@ -261,10 +261,10 @@ export default function Bills() {
                         onClick={() => viewBillDetail(bill.billID)}
                       ></i>
 
-                      <i
+                      {/* <i
                         className="fas fa-trash action-icon delete"
                         onClick={() => deleteBill(bill.billID)}
-                      ></i>
+                      ></i> */}
                     </td>
                   </tr>
                 ))}

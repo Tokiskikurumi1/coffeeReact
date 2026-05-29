@@ -226,7 +226,7 @@ export default function ManageBill() {
           <>
             <button onClick={() => updateStatus(billId, 3)}>Đã giao</button>
             <button onClick={() => updateStatus(billId, 4)}>Huỷ</button>
-            <button onClick={() => exportBillPDF(billId)}>Xuất hóa đơn</button>
+            {/* <button onClick={() => exportBillPDF(billId)}>Xuất hóa đơn</button> */}
           </>
         );
       default:
